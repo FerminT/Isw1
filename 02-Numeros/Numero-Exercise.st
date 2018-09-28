@@ -395,11 +395,13 @@ additionFromEntero: anEnteroAdder
 
 	^self class with: value + anEnteroAdder integerValue! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'ft 9/27/2018 10:13:35'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'ft 9/27/2018 17:01:29'!
 additionFromFraccion: aFraccionAdder
 
 	| newNumerator |
+	
 	newNumerator _ self * aFraccionAdder denominator + aFraccionAdder numerator.
+	
 	^newNumerator / aFraccionAdder denominator! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'ft 9/27/2018 10:13:45'!
@@ -449,14 +451,10 @@ productFromFraccion: aFraccionMultiplier
 	
 	^newNumerator / aFraccionMultiplier denominator! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'ft 9/27/2018 10:28:18'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'ft 9/27/2018 20:51:26'!
 subtractionFromEntero: anEnteroSubtrahend
-
-	| inverseSubtraction |
 	
-	inverseSubtraction _ self class with: value - anEnteroSubtrahend integerValue.
-	
-	^inverseSubtraction * (self class with: -1)! !
+	^self class with: (anEnteroSubtrahend integerValue) - value.! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'ft 9/27/2018 10:29:59'!
 subtractionFromFraccion: aFraccionSubtrahend
@@ -595,12 +593,13 @@ divisionFromFraccion: aFraccionDivisor
 	
 	^(aFraccionDivisor numerator * denominator) / (aFraccionDivisor denominator * numerator)! !
 
-!Fraccion methodsFor: 'arithmetic operations' stamp: 'ft 9/27/2018 10:18:02'!
+!Fraccion methodsFor: 'arithmetic operations' stamp: 'ft 9/27/2018 17:01:48'!
 productFromEntero: anEnteroMultiplier
 
 	| newNumerator |
 
 	newNumerator _ anEnteroMultiplier * numerator.
+	
 	^newNumerator / denominator.! !
 
 !Fraccion methodsFor: 'arithmetic operations' stamp: 'ft 9/27/2018 10:18:10'!
