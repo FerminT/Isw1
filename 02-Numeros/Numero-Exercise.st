@@ -418,18 +418,10 @@ divisionFromFraccion: aFraccionDivisor
 	
 	^Fraccion with: aFraccionDivisor numerator over: newDenominator! !
 
-!Entero methodsFor: 'arithmetic operations' stamp: 'HAW 9/24/2018 08:47:50'!
+!Entero methodsFor: 'arithmetic operations' stamp: 'lto 9/30/2018 16:50:13'!
 fibonacci
 
-	| one two |
-	
-	one := Entero with: 1.
-	two := Entero with: 2.
-	
-	self isNegative ifTrue: [self error: Entero negativeFibonacciErrorDescription ].	
-	(self isZero or: [self isOne]) ifTrue: [^one].
-	
-	^ (self - one) fibonacci + (self - two) fibonacci
+	self subclassResponsibility 
 		! !
 
 !Entero methodsFor: 'arithmetic operations' stamp: 'HernanWilkinson 5/7/2016 21:00'!
@@ -518,17 +510,31 @@ isZero
 Entero class
 	instanceVariableNames: ''!
 
-!Entero class methodsFor: 'instance creation' stamp: 'NR 9/23/2018 22:17:16'!
-negativeFibonacciErrorDescription
-	^ ' Fibonacci no está definido aquí para enteros negativos'! !
+!Entero class methodsFor: 'instance creation' stamp: 'lto 9/30/2018 16:27:48'!
+accept: aValue 
 
-!Entero class methodsFor: 'instance creation' stamp: 'HernanWilkinson 5/7/2016 22:53'!
-with: aValue 
+	self subclassResponsibility ! !
+
+!Entero class methodsFor: 'instance creation' stamp: 'lto 9/30/2018 16:46:36'!
+inicialice: aValue 
 	
 	"Esta verificacion esta puesta por si se equivocan y quieren crear un Entero pasando otra cosa que un Integer - Hernan"
 	aValue isInteger ifFalse: [  self error: 'aValue debe ser anInteger' ].
 	
 	^self new initalizeWith: aValue! !
+
+!Entero class methodsFor: 'instance creation' stamp: 'NR 9/23/2018 22:17:16'!
+negativeFibonacciErrorDescription
+	^ ' Fibonacci no está definido aquí para enteros negativos'! !
+
+!Entero class methodsFor: 'instance creation' stamp: 'lto 9/30/2018 16:31:38'!
+with: aValue 
+
+	| enteroClass |
+
+	enteroClass _ Entero subclasses detect: [ :unEnteroClass | unEnteroClass accept: aValue ].
+	
+	^ enteroClass inicialice: aValue.! !
 
 
 !classDefinition: #Cero category: #'Numero-Exercise'!
@@ -537,6 +543,21 @@ Entero subclass: #Cero
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:50:37'!
+fibonacci
+
+	^ Entero with: 1! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:58:17'!
+isDenominadorValido
+
+	self error: 'una fraccion no puede ser cero' ! !
+
+!Cero methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:57:20'!
+isNumeradorValido
+
+	self error: 'una fraccion no puede ser cero' ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -557,6 +578,33 @@ Entero subclass: #LosDemas
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
+!LosDemas methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:50:46'!
+fibonacci
+
+	| one two |
+	
+	one := Entero with: 1.
+	two := Entero with: 2.
+	
+	^ (self - one) fibonacci + (self - two) fibonacci! !
+
+!LosDemas methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:59:00'!
+isDenominadorValido! !
+
+!LosDemas methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:56:25'!
+isNumeradorValido! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'LosDemas class' category: #'Numero-Exercise'!
+LosDemas class
+	instanceVariableNames: ''!
+
+!LosDemas class methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:31:31'!
+accept: aNumber
+
+	^aNumber > 1! !
+
 
 !classDefinition: #Negativos category: #'Numero-Exercise'!
 Entero subclass: #Negativos
@@ -564,6 +612,17 @@ Entero subclass: #Negativos
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
+
+!Negativos methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:51:03'!
+fibonacci
+
+	self error: Entero negativeFibonacciErrorDescription! !
+
+!Negativos methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:59:04'!
+isDenominadorValido! !
+
+!Negativos methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:56:33'!
+isNumeradorValido! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -583,6 +642,19 @@ Entero subclass: #Uno
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:51:29'!
+fibonacci
+
+	^ self! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:59:26'!
+isDenominadorValido
+
+	self error: 'una fraccion no puede tener denominador 1 porque sino es un entero'! !
+
+!Uno methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:56:43'!
+isNumeradorValido! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -714,12 +786,12 @@ numerator
 	^ numerator! !
 
 
-!Fraccion methodsFor: 'initialization' stamp: 'HernanWilkinson 5/7/2016 22:54'!
+!Fraccion methodsFor: 'initialization' stamp: 'lto 9/30/2018 16:59:44'!
 initializeWith: aNumerator over: aDenominator
 
 	"Estas precondiciones estan por si se comenten errores en la implementacion - Hernan"
-	aNumerator isZero ifTrue: [ self error: 'una fraccion no puede ser cero' ].
-	aDenominator isOne ifTrue: [ self error: 'una fraccion no puede tener denominador 1 porque sino es un entero' ].
+	aNumerator isNumeradorValido .
+	aDenominator isDenominadorValido .
 	
 	numerator := aNumerator.
 	denominator := aDenominator ! !
@@ -755,7 +827,7 @@ printOn: aStream
 Fraccion class
 	instanceVariableNames: ''!
 
-!Fraccion class methodsFor: 'intance creation' stamp: 'NR 9/23/2018 23:45:19'!
+!Fraccion class methodsFor: 'intance creation' stamp: 'lto 9/30/2018 17:01:54'!
 with: aDividend over: aDivisor
 
 	| greatestCommonDivisor numerator denominator |
