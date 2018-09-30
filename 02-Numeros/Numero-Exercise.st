@@ -510,13 +510,13 @@ isZero
 Entero class
 	instanceVariableNames: ''!
 
-!Entero class methodsFor: 'instance creation' stamp: 'lto 9/30/2018 16:27:48'!
-accept: aValue 
+!Entero class methodsFor: 'instance creation' stamp: 'fermin 9/30/2018 17:34:30'!
+accept: aNumber
 
-	self subclassResponsibility ! !
+	^aNumber = 1! !
 
-!Entero class methodsFor: 'instance creation' stamp: 'lto 9/30/2018 16:46:36'!
-inicialice: aValue 
+!Entero class methodsFor: 'instance creation' stamp: 'fermin 9/30/2018 16:22:26'!
+initialize: aValue 
 	
 	"Esta verificacion esta puesta por si se equivocan y quieren crear un Entero pasando otra cosa que un Integer - Hernan"
 	aValue isInteger ifFalse: [  self error: 'aValue debe ser anInteger' ].
@@ -527,14 +527,14 @@ inicialice: aValue
 negativeFibonacciErrorDescription
 	^ ' Fibonacci no está definido aquí para enteros negativos'! !
 
-!Entero class methodsFor: 'instance creation' stamp: 'lto 9/30/2018 16:31:38'!
+!Entero class methodsFor: 'instance creation' stamp: 'fermin 9/30/2018 17:22:29'!
 with: aValue 
 
 	| enteroClass |
 
 	enteroClass _ Entero subclasses detect: [ :unEnteroClass | unEnteroClass accept: aValue ].
 	
-	^ enteroClass inicialice: aValue.! !
+	^ enteroClass initialize: aValue.! !
 
 
 !classDefinition: #Cero category: #'Numero-Exercise'!
@@ -544,20 +544,37 @@ Entero subclass: #Cero
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!Cero methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:50:37'!
+!Cero methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:17:35'!
+canNotDivideByZero
+
+	self error: Numero canNotDivideByZeroErrorDescription ! !
+
+!Cero methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:39:02'!
+ifNegativeExecute: aBlockClosureToExecute! !
+
+!Cero methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:39:43'!
+ifOneExecute: aBlockToExecute! !
+
+!Cero methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:39:55'!
+ifZeroExecute: aBlockClosureToExecute
+
+	aBlockClosureToExecute value.! !
+
+!Cero methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:40:15'!
+isValidDenominator
+
+	self error: 'una fraccion no puede ser cero' ! !
+
+!Cero methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:40:25'!
+isValidNumerator
+
+	self error: 'una fraccion no puede ser cero' ! !
+
+
+!Cero methodsFor: 'arithmetic operations' stamp: 'lto 9/30/2018 16:50:37'!
 fibonacci
 
 	^ Entero with: 1! !
-
-!Cero methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:58:17'!
-isDenominadorValido
-
-	self error: 'una fraccion no puede ser cero' ! !
-
-!Cero methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:57:20'!
-isNumeradorValido
-
-	self error: 'una fraccion no puede ser cero' ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -565,7 +582,7 @@ isNumeradorValido
 Cero class
 	instanceVariableNames: ''!
 
-!Cero class methodsFor: 'as yet unclassified' stamp: 'ft 9/27/2018 21:53:14'!
+!Cero class methodsFor: 'initialization' stamp: 'ft 9/27/2018 21:53:14'!
 accept: aNumber
 
 	^aNumber = 0! !
@@ -578,7 +595,7 @@ Entero subclass: #LosDemas
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!LosDemas methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:50:46'!
+!LosDemas methodsFor: 'arithmetic operations' stamp: 'lto 9/30/2018 16:50:46'!
 fibonacci
 
 	| one two |
@@ -588,11 +605,24 @@ fibonacci
 	
 	^ (self - one) fibonacci + (self - two) fibonacci! !
 
-!LosDemas methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:59:00'!
-isDenominadorValido! !
 
-!LosDemas methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:56:25'!
-isNumeradorValido! !
+!LosDemas methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:14:59'!
+canNotDivideByZero! !
+
+!LosDemas methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:42:17'!
+ifNegativeExecute: aBlockClosureToExecute! !
+
+!LosDemas methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:42:24'!
+ifOneExecute: aBlockToExecute! !
+
+!LosDemas methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:42:38'!
+ifZeroExecute: aBlockClosureToExecute! !
+
+!LosDemas methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:42:56'!
+isValidDenominator! !
+
+!LosDemas methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:43:04'!
+isValidNumerator! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -600,7 +630,7 @@ isNumeradorValido! !
 LosDemas class
 	instanceVariableNames: ''!
 
-!LosDemas class methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:31:31'!
+!LosDemas class methodsFor: 'initialization' stamp: 'lto 9/30/2018 16:31:31'!
 accept: aNumber
 
 	^aNumber > 1! !
@@ -613,16 +643,31 @@ Entero subclass: #Negativos
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!Negativos methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:51:03'!
+!Negativos methodsFor: 'arithmetic operations' stamp: 'lto 9/30/2018 16:51:03'!
 fibonacci
 
 	self error: Entero negativeFibonacciErrorDescription! !
 
-!Negativos methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:59:04'!
-isDenominadorValido! !
 
-!Negativos methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:56:33'!
-isNumeradorValido! !
+!Negativos methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:15:05'!
+canNotDivideByZero! !
+
+!Negativos methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:43:51'!
+ifNegativeExecute: aBlockClosureToExecute
+
+	aBlockClosureToExecute value.! !
+
+!Negativos methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:43:57'!
+ifOneExecute: aBlockToExecute! !
+
+!Negativos methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:44:04'!
+ifZeroExecute: aBlockClosureToExecute! !
+
+!Negativos methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:44:12'!
+isValidDenominator! !
+
+!Negativos methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:44:18'!
+isValidNumerator! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -630,7 +675,7 @@ isNumeradorValido! !
 Negativos class
 	instanceVariableNames: ''!
 
-!Negativos class methodsFor: 'as yet unclassified' stamp: 'ft 9/27/2018 21:51:41'!
+!Negativos class methodsFor: 'initialization' stamp: 'ft 9/27/2018 21:51:41'!
 accept: aNumber
 
 	^aNumber < 0! !
@@ -643,18 +688,33 @@ Entero subclass: #Uno
 	poolDictionaries: ''
 	category: 'Numero-Exercise'!
 
-!Uno methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:51:29'!
+!Uno methodsFor: 'arithmetic operations' stamp: 'lto 9/30/2018 16:51:29'!
 fibonacci
 
 	^ self! !
 
-!Uno methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:59:26'!
-isDenominadorValido
+
+!Uno methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:15:11'!
+canNotDivideByZero! !
+
+!Uno methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:45:04'!
+ifNegativeExecute: aBlockClosureToExecute! !
+
+!Uno methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:45:57'!
+ifOneExecute: aBlockToExecute
+
+	aBlockToExecute value.! !
+
+!Uno methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:45:21'!
+ifZeroExecute: aBlockClosureToExecute! !
+
+!Uno methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:45:29'!
+isValidDenominator
 
 	self error: 'una fraccion no puede tener denominador 1 porque sino es un entero'! !
 
-!Uno methodsFor: 'as yet unclassified' stamp: 'lto 9/30/2018 16:56:43'!
-isNumeradorValido! !
+!Uno methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:45:39'!
+isValidNumerator! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -662,7 +722,7 @@ isNumeradorValido! !
 Uno class
 	instanceVariableNames: ''!
 
-!Uno class methodsFor: 'as yet unclassified' stamp: 'ft 9/27/2018 21:52:48'!
+!Uno class methodsFor: 'initialization' stamp: 'fermin 9/30/2018 17:35:03'!
 accept: aNumber
 
 	^aNumber = 1! !
@@ -786,12 +846,12 @@ numerator
 	^ numerator! !
 
 
-!Fraccion methodsFor: 'initialization' stamp: 'lto 9/30/2018 16:59:44'!
+!Fraccion methodsFor: 'initialization' stamp: 'fermin 9/30/2018 17:46:25'!
 initializeWith: aNumerator over: aDenominator
 
 	"Estas precondiciones estan por si se comenten errores en la implementacion - Hernan"
-	aNumerator isNumeradorValido .
-	aDenominator isDenominadorValido .
+	aNumerator isValidNumerator.
+	aDenominator isValidDenominator.
 	
 	numerator := aNumerator.
 	denominator := aDenominator ! !
@@ -827,21 +887,21 @@ printOn: aStream
 Fraccion class
 	instanceVariableNames: ''!
 
-!Fraccion class methodsFor: 'intance creation' stamp: 'lto 9/30/2018 17:01:54'!
+!Fraccion class methodsFor: 'intance creation' stamp: 'fermin 9/30/2018 17:46:49'!
 with: aDividend over: aDivisor
 
 	| greatestCommonDivisor numerator denominator |
 	
-	aDivisor isZero ifTrue: [ self error: self canNotDivideByZeroErrorDescription ].
-	aDividend isZero ifTrue: [ ^aDividend ].
+	aDivisor canNotDivideByZero.
+	aDividend ifZeroExecute: [^ aDividend] .
 	
-	aDivisor isNegative ifTrue:[ ^aDividend negated / aDivisor negated].
+	aDivisor ifNegativeExecute: [^aDividend negated / aDivisor negated].
 	
 	greatestCommonDivisor := aDividend greatestCommonDivisorWith: aDivisor. 
 	numerator := aDividend // greatestCommonDivisor.
 	denominator := aDivisor // greatestCommonDivisor.
 	
-	denominator isOne ifTrue: [ ^numerator ].
+	denominator ifOneExecute: [^ numerator].
 
 	^self new initializeWith: numerator over: denominator
 	! !
