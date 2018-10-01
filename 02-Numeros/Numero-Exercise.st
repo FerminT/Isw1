@@ -489,20 +489,20 @@ printOn: aStream
 	aStream print: value ! !
 
 
-!Entero methodsFor: 'testing' stamp: 'NR 9/23/2018 22:17:55'!
+!Entero methodsFor: 'testing' stamp: 'ft 10/1/2018 10:13:13'!
 isNegative
 	
-	^value < 0! !
+	self subclassResponsibility ! !
 
-!Entero methodsFor: 'testing' stamp: 'HernanWilkinson 5/7/2016 20:14'!
+!Entero methodsFor: 'testing' stamp: 'ft 10/1/2018 10:13:21'!
 isOne
 	
-	^value = 1! !
+	self subclassResponsibility ! !
 
-!Entero methodsFor: 'testing' stamp: 'HernanWilkinson 5/7/2016 20:12'!
+!Entero methodsFor: 'testing' stamp: 'ft 10/1/2018 10:13:30'!
 isZero
 	
-	^value = 0! !
+	self subclassResponsibility ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -510,10 +510,10 @@ isZero
 Entero class
 	instanceVariableNames: ''!
 
-!Entero class methodsFor: 'instance creation' stamp: 'fermin 9/30/2018 17:34:30'!
+!Entero class methodsFor: 'instance creation' stamp: 'ft 10/1/2018 10:09:48'!
 accept: aNumber
 
-	^aNumber = 1! !
+	self subclassResponsibility ! !
 
 !Entero class methodsFor: 'instance creation' stamp: 'fermin 9/30/2018 16:22:26'!
 initialize: aValue 
@@ -523,18 +523,19 @@ initialize: aValue
 	
 	^self new initalizeWith: aValue! !
 
-!Entero class methodsFor: 'instance creation' stamp: 'NR 9/23/2018 22:17:16'!
-negativeFibonacciErrorDescription
-	^ ' Fibonacci no está definido aquí para enteros negativos'! !
-
-!Entero class methodsFor: 'instance creation' stamp: 'fermin 9/30/2018 17:22:29'!
+!Entero class methodsFor: 'instance creation' stamp: 'ft 10/1/2018 10:09:12'!
 with: aValue 
 
 	| enteroClass |
 
-	enteroClass _ Entero subclasses detect: [ :unEnteroClass | unEnteroClass accept: aValue ].
+	enteroClass _ Entero subclasses detect: [ :anEnteroClass | anEnteroClass accept: aValue ].
 	
 	^ enteroClass initialize: aValue.! !
+
+
+!Entero class methodsFor: 'error descriptions' stamp: 'NR 9/23/2018 22:17:16'!
+negativeFibonacciErrorDescription
+	^ ' Fibonacci no está definido aquí para enteros negativos'! !
 
 
 !classDefinition: #Cero category: #'Numero-Exercise'!
@@ -560,6 +561,16 @@ ifZeroExecute: aBlockClosureToExecute
 
 	aBlockClosureToExecute value.! !
 
+!Cero methodsFor: 'testing' stamp: 'ft 10/1/2018 10:13:59'!
+isNegative
+
+	^false! !
+
+!Cero methodsFor: 'testing' stamp: 'ft 10/1/2018 10:13:52'!
+isOne
+
+	^false! !
+
 !Cero methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:40:15'!
 isValidDenominator
 
@@ -569,6 +580,11 @@ isValidDenominator
 isValidNumerator
 
 	self error: 'una fraccion no puede ser cero' ! !
+
+!Cero methodsFor: 'testing' stamp: 'ft 10/1/2018 10:13:42'!
+isZero
+
+	^true! !
 
 
 !Cero methodsFor: 'arithmetic operations' stamp: 'lto 9/30/2018 16:50:37'!
@@ -618,11 +634,26 @@ ifOneExecute: aBlockToExecute! !
 !LosDemas methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:42:38'!
 ifZeroExecute: aBlockClosureToExecute! !
 
+!LosDemas methodsFor: 'testing' stamp: 'ft 10/1/2018 10:14:27'!
+isNegative
+
+	^false! !
+
+!LosDemas methodsFor: 'testing' stamp: 'ft 10/1/2018 10:14:21'!
+isOne
+
+	^false! !
+
 !LosDemas methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:42:56'!
 isValidDenominator! !
 
 !LosDemas methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:43:04'!
 isValidNumerator! !
+
+!LosDemas methodsFor: 'testing' stamp: 'ft 10/1/2018 10:14:17'!
+isZero
+
+	^false! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -663,11 +694,26 @@ ifOneExecute: aBlockToExecute! !
 !Negativos methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:44:04'!
 ifZeroExecute: aBlockClosureToExecute! !
 
+!Negativos methodsFor: 'testing' stamp: 'ft 10/1/2018 10:14:50'!
+isNegative
+
+	^true! !
+
+!Negativos methodsFor: 'testing' stamp: 'ft 10/1/2018 10:14:38'!
+isOne
+
+	^false! !
+
 !Negativos methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:44:12'!
 isValidDenominator! !
 
 !Negativos methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:44:18'!
 isValidNumerator! !
+
+!Negativos methodsFor: 'testing' stamp: 'ft 10/1/2018 10:14:42'!
+isZero
+
+	^false! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -708,6 +754,16 @@ ifOneExecute: aBlockToExecute
 !Uno methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:45:21'!
 ifZeroExecute: aBlockClosureToExecute! !
 
+!Uno methodsFor: 'testing' stamp: 'ft 10/1/2018 10:15:00'!
+isNegative
+
+	^false! !
+
+!Uno methodsFor: 'testing' stamp: 'ft 10/1/2018 10:15:11'!
+isOne
+
+	^true! !
+
 !Uno methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:45:29'!
 isValidDenominator
 
@@ -715,6 +771,11 @@ isValidDenominator
 
 !Uno methodsFor: 'testing' stamp: 'fermin 9/30/2018 17:45:39'!
 isValidNumerator! !
+
+!Uno methodsFor: 'testing' stamp: 'ft 10/1/2018 10:15:04'!
+isZero
+
+	^false! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
