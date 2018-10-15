@@ -130,27 +130,35 @@ balance
 	^account1 balance + account2 balance! !
 
 
-!Portfolio methodsFor: 'testing' stamp: 'HAW 10/11/2018 16:53:28'!
+!Portfolio methodsFor: 'testing' stamp: 'ft 10/14/2018 20:36:59'!
 doesManage: anAccount
 
-	self shouldBeImplemented 
+	anAccount class = Portfolio ifTrue: [^(account1 = anAccount) or: [account2 = anAccount]].
+	^(account1 doesManage: anAccount) or: [account2 doesManage: anAccount]
 ! !
 
-!Portfolio methodsFor: 'testing' stamp: 'ft 10/11/2018 21:31:00'!
+!Portfolio methodsFor: 'testing' stamp: 'ft 10/14/2018 20:08:05'!
 hasRegistered: aTransaction
 
-	(account1 hasRegistered: aTransaction) ifFalse: [ account2 hasRegistered: aTransaction ]! !
+	^(account1 hasRegistered: aTransaction) or: [account2 hasRegistered: aTransaction]! !
 
 
-!Portfolio methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:39'!
+!Portfolio methodsFor: 'transactions' stamp: 'ft 10/14/2018 20:44:55'!
 transactions 
 
-	self shouldBeImplemented ! !
+	| transactions |
 
-!Portfolio methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:40'!
+	transactions _ OrderedCollection new.
+	transactions addAll: account1 transactions.
+	transactions addAll: account2 transactions.
+	
+	^transactions! !
+
+!Portfolio methodsFor: 'transactions' stamp: 'ft 10/14/2018 21:36:57'!
 transactionsOf: anAccount 
-
-	self shouldBeImplemented ! !
+	(self doesManage: anAccount) ifTrue:  [^anAccount transactions].
+	
+	^self error: self class accountNotManagedMessageDescription! !
 
 
 !Portfolio methodsFor: 'as yet unclassified' stamp: 'ft 10/11/2018 21:25:58'!
@@ -165,9 +173,11 @@ initializeWith: leftAccount andWith: rightAccount
 Portfolio class
 	instanceVariableNames: ''!
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'ft 10/11/2018 21:24:13'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'ft 10/14/2018 21:38:09'!
 with: leftAccount with: rightAccount
-
+	
+	leftAccount = rightAccount ifTrue: [^self error: self accountAlreadyManagedErrorMessage].
+	
 	^self new initializeWith: leftAccount andWith: rightAccount! !
 
 !Portfolio class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:41'!
@@ -211,6 +221,11 @@ register: aTransaction
 transactions 
 
 	^ transactions copy! !
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'ft 10/14/2018 21:14:04'!
+transactionsOf: anAccount
+
+	anAccount = self ifTrue: [^self transactions]! !
 
 
 !ReceptiveAccount methodsFor: 'balance' stamp: 'ft 10/11/2018 21:08:15'!
