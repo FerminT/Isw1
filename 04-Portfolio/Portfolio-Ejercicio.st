@@ -45,6 +45,11 @@ value
 
 	^ value! !
 
+!Deposit methodsFor: 'value' stamp: 'ft 10/16/2018 15:00:52'!
+valueForBalance
+
+	^value! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'Deposit class' category: #'Portfolio-Ejercicio'!
@@ -74,6 +79,11 @@ initializeFor: aValue
 value
 
 	^ value! !
+
+!Withdraw methodsFor: 'value' stamp: 'ft 10/16/2018 15:01:06'!
+valueForBalance
+
+	^value negated! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -119,53 +129,58 @@ balance
 
 !classDefinition: #Portfolio category: #'Portfolio-Ejercicio'!
 SummarizingAccount subclass: #Portfolio
-	instanceVariableNames: 'account1 account2'
+	instanceVariableNames: 'accounts'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Portfolio-Ejercicio'!
 
-!Portfolio methodsFor: 'balance' stamp: 'ft 10/11/2018 21:26:30'!
+!Portfolio methodsFor: 'balance' stamp: 'ft 10/16/2018 10:43:39'!
 balance
 
-	^account1 balance + account2 balance! !
+	^accounts sum: [ :anAccount | anAccount balance]! !
 
 
-!Portfolio methodsFor: 'testing' stamp: 'ft 10/14/2018 20:36:59'!
+!Portfolio methodsFor: 'testing' stamp: 'ft 10/16/2018 13:11:01'!
 doesManage: anAccount
 
-	anAccount class = Portfolio ifTrue: [^(account1 = anAccount) or: [account2 = anAccount]].
-	^(account1 doesManage: anAccount) or: [account2 doesManage: anAccount]
+	anAccount class = Portfolio ifTrue: [
+		^accounts anySatisfy: [ :account | account = anAccount or: [account doesManage: anAccount]]].
+	
+	^accounts anySatisfy: [ :account | account doesManage: anAccount]
 ! !
 
-!Portfolio methodsFor: 'testing' stamp: 'ft 10/14/2018 20:08:05'!
+!Portfolio methodsFor: 'testing' stamp: 'ft 10/16/2018 11:21:20'!
 hasRegistered: aTransaction
 
-	^(account1 hasRegistered: aTransaction) or: [account2 hasRegistered: aTransaction]! !
+	^accounts anySatisfy: [ :account | account hasRegistered: aTransaction]! !
 
 
-!Portfolio methodsFor: 'transactions' stamp: 'ft 10/14/2018 20:44:55'!
+!Portfolio methodsFor: 'transactions' stamp: 'ft 10/16/2018 11:00:43'!
 transactions 
 
 	| transactions |
 
 	transactions _ OrderedCollection new.
-	transactions addAll: account1 transactions.
-	transactions addAll: account2 transactions.
+	accounts do: [ :account | transactions addAll: account transactions].
 	
 	^transactions! !
 
-!Portfolio methodsFor: 'transactions' stamp: 'ft 10/14/2018 21:36:57'!
+!Portfolio methodsFor: 'transactions' stamp: 'ft 10/16/2018 13:18:14'!
 transactionsOf: anAccount 
-	(self doesManage: anAccount) ifTrue:  [^anAccount transactions].
+
+	(self doesManage: anAccount) ifTrue: [^anAccount transactions].
 	
 	^self error: self class accountNotManagedMessageDescription! !
 
 
-!Portfolio methodsFor: 'as yet unclassified' stamp: 'ft 10/11/2018 21:25:58'!
-initializeWith: leftAccount andWith: rightAccount
+!Portfolio methodsFor: 'initialize' stamp: 'ft 10/16/2018 12:36:59'!
+initializeWith: arrayOfAccounts
 
-	account1 _ leftAccount.
-	account2 _ rightAccount.! !
+	accounts _ OrderedCollection new.
+	
+	arrayOfAccounts do: [ :anAccount | (self doesManage: anAccount) 
+		ifTrue: [^self error: self class accountAlreadyManagedErrorMessage]
+		ifFalse: [accounts add: anAccount]]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -173,17 +188,20 @@ initializeWith: leftAccount andWith: rightAccount
 Portfolio class
 	instanceVariableNames: ''!
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'ft 10/14/2018 21:38:09'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'ft 10/16/2018 11:59:56'!
 with: leftAccount with: rightAccount
 	
-	leftAccount = rightAccount ifTrue: [^self error: self accountAlreadyManagedErrorMessage].
+	| accounts |
+
+	accounts _ OrderedCollection new.	
+	accounts add: leftAccount; add: rightAccount.
 	
-	^self new initializeWith: leftAccount andWith: rightAccount! !
+	^self withAll: accounts! !
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'HernanWilkinson 7/13/2011 18:41'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'ft 10/16/2018 12:34:57'!
 withAll: aCollectionOfAccounts
-
-	self shouldBeImplemented ! !
+		
+	^self new initializeWith: aCollectionOfAccounts! !
 
 
 !Portfolio class methodsFor: 'error messages' stamp: 'HAW 5/8/2018 16:08:43'!
@@ -222,16 +240,11 @@ transactions
 
 	^ transactions copy! !
 
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'ft 10/14/2018 21:14:04'!
-transactionsOf: anAccount
 
-	anAccount = self ifTrue: [^self transactions]! !
-
-
-!ReceptiveAccount methodsFor: 'balance' stamp: 'ft 10/11/2018 21:08:15'!
+!ReceptiveAccount methodsFor: 'balance' stamp: 'ft 10/16/2018 15:04:52'!
 balance
 
-	^ transactions sum: [ :aTransaction | aTransaction class = Deposit ifTrue: [aTransaction value ] ifFalse: [aTransaction value * -1] ] ifEmpty: [^0]! !
+	^transactions inject: 0 into: [ :sum :aTransaction | sum + aTransaction valueForBalance]! !
 
 
 !ReceptiveAccount methodsFor: 'testing' stamp: 'HAW 10/11/2018 16:53:28'!
