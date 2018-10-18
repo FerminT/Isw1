@@ -140,19 +140,20 @@ balance
 	^accounts sum: [ :anAccount | anAccount balance]! !
 
 
-!Portfolio methodsFor: 'testing' stamp: 'ft 10/16/2018 13:11:01'!
+!Portfolio methodsFor: 'testing' stamp: 'ft 10/18/2018 11:51:52'!
 doesManage: anAccount
 
-	anAccount class = Portfolio ifTrue: [
-		^accounts anySatisfy: [ :account | account = anAccount or: [account doesManage: anAccount]]].
-	
-	^accounts anySatisfy: [ :account | account doesManage: anAccount]
-! !
+	^anAccount isManagedByPortfolio: self! !
 
 !Portfolio methodsFor: 'testing' stamp: 'ft 10/16/2018 11:21:20'!
 hasRegistered: aTransaction
 
 	^accounts anySatisfy: [ :account | account hasRegistered: aTransaction]! !
+
+!Portfolio methodsFor: 'testing' stamp: 'ft 10/18/2018 12:26:51'!
+managesAnyAccountOf: anAccount
+
+	^anAccount managesAnyAccountOfPortfolio: self! !
 
 
 !Portfolio methodsFor: 'transactions' stamp: 'ft 10/16/2018 11:00:43'!
@@ -173,14 +174,27 @@ transactionsOf: anAccount
 	^self error: self class accountNotManagedMessageDescription! !
 
 
-!Portfolio methodsFor: 'initialize' stamp: 'ft 10/16/2018 12:36:59'!
-initializeWith: arrayOfAccounts
+!Portfolio methodsFor: 'initialize' stamp: 'ft 10/18/2018 11:32:53'!
+safeWith: aValidCollectionOfAccounts
 
-	accounts _ OrderedCollection new.
-	
-	arrayOfAccounts do: [ :anAccount | (self doesManage: anAccount) 
-		ifTrue: [^self error: self class accountAlreadyManagedErrorMessage]
-		ifFalse: [accounts add: anAccount]]! !
+	accounts _ aValidCollectionOfAccounts copy! !
+
+
+!Portfolio methodsFor: 'testing - private' stamp: 'ft 10/18/2018 11:43:00'!
+doesManageReceptiveAccount: aReceptiveAccount
+
+	^accounts anySatisfy: [ :account | account doesManage: aReceptiveAccount]! !
+
+!Portfolio methodsFor: 'testing - private' stamp: 'ft 10/18/2018 12:53:31'!
+isManagedByPortfolio: aPortfolio
+
+	"Un portfolio maneja a otro portfolio sii. contiene a todas sus cuentas"
+	^accounts allSatisfy: [ :account | aPortfolio doesManage: account]! !
+
+!Portfolio methodsFor: 'testing - private' stamp: 'ft 10/18/2018 12:29:34'!
+managesAnyAccountOfPortfolio: aPortfolio
+
+	^accounts anySatisfy: [ :account | aPortfolio doesManage: account]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -198,10 +212,28 @@ with: leftAccount with: rightAccount
 	
 	^self withAll: accounts! !
 
-!Portfolio class methodsFor: 'instance creation' stamp: 'ft 10/16/2018 12:34:57'!
+!Portfolio class methodsFor: 'instance creation' stamp: 'ft 10/18/2018 12:52:06'!
 withAll: aCollectionOfAccounts
+	
+	| accounts |
+	
+	"Me aseguro de que se cumpla la precondición de que sean subclases de SummarizingAccount"
+	(aCollectionOfAccounts allSatisfy: [ :anAccountToVerify | anAccountToVerify class superclass = SummarizingAccount])
+		ifFalse: [^self error: 'Not a valid instance'].
 		
-	^self new initializeWith: aCollectionOfAccounts! !
+	accounts _ OrderedCollection new.
+	
+	"Como solo debo crear objetos válidos, corresponde hacer la verificación antes de crear una instancia"
+	
+	"Disclaimer: usamos el mensaje #managesAnyAccountOf en lugar de #doesManage porque interpretamos que
+	(Portfolio1 doesManage: Portfolio2) sii. TODAS las cuentas de Portfolio2 están incluidas en Portfolio1.
+	Por lo tanto, no corresponde usar el mensaje #doesManage, sino ver si Portfolio1 contiene ALGUNA de las cuentas de Portfolio2."
+	
+	aCollectionOfAccounts do: [ :anAccountToVerify | (accounts anySatisfy: [ :account | account managesAnyAccountOf: anAccountToVerify])
+		ifTrue: [^self error: self accountAlreadyManagedErrorMessage]
+		ifFalse: [accounts add: anAccountToVerify]].
+	
+	^self new safeWith: aCollectionOfAccounts! !
 
 
 !Portfolio class methodsFor: 'error messages' stamp: 'HAW 5/8/2018 16:08:43'!
@@ -253,8 +285,24 @@ doesManage: anAccount
 	^ self = anAccount 
 ! !
 
-!ReceptiveAccount methodsFor: 'testing' stamp: 'HAW 10/11/2018 16:53:54'!
-hasRegistered: aTtransaction
+!ReceptiveAccount methodsFor: 'testing' stamp: 'ft 10/18/2018 12:54:14'!
+hasRegistered: aTransaction
 
-	^ transactions includes: aTtransaction 
+	^ transactions includes: aTransaction 
 ! !
+
+!ReceptiveAccount methodsFor: 'testing' stamp: 'ft 10/18/2018 12:17:33'!
+managesAnyAccountOf: anAccount
+
+	^self doesManage: anAccount! !
+
+
+!ReceptiveAccount methodsFor: 'testing - private' stamp: 'ft 10/18/2018 11:41:52'!
+isManagedByPortfolio: aPortfolio
+
+	^aPortfolio doesManageReceptiveAccount: self! !
+
+!ReceptiveAccount methodsFor: 'testing - private' stamp: 'ft 10/18/2018 12:28:55'!
+managesAnyAccountOfPortfolio: aPortfolio
+
+	^self isManagedByPortfolio: aPortfolio! !
