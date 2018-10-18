@@ -114,6 +114,11 @@ hasRegistered: aTransaction
 
 	self subclassResponsibility ! !
 
+!SummarizingAccount methodsFor: 'testing' stamp: 'ft 10/18/2018 13:01:00'!
+managesAnyAccountOf: anAccount
+
+	self subclassResponsibility ! !
+
 
 !SummarizingAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:35'!
 transactions
