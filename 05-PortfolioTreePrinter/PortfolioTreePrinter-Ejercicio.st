@@ -15,6 +15,12 @@ value
 
 	self subclassResponsibility ! !
 
+
+!AccountTransaction methodsFor: 'print' stamp: 'ft 10/20/2018 14:44:55'!
+print
+
+	self subclassResponsibility ! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'AccountTransaction class' category: #'PortfolioTreePrinter-Ejercicio'!
@@ -54,6 +60,12 @@ affectBalance: currentBalance
 value
 
 	^ value! !
+
+
+!Deposit methodsFor: 'print' stamp: 'ft 10/20/2018 14:54:52'!
+print
+
+	^'Deposito por ', value printString! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -100,6 +112,12 @@ transfer
 
 	^ transfer! !
 
+
+!TransferLeg methodsFor: 'print' stamp: 'ft 10/20/2018 14:46:04'!
+print
+
+	self subclassResponsibility ! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'TransferLeg class' category: #'PortfolioTreePrinter-Ejercicio'!
@@ -134,6 +152,12 @@ affectBalance: currentBalance
 initializeFor: aTransfer
 
 	transfer _ aTransfer! !
+
+
+!TransferDeposit methodsFor: 'print' stamp: 'ft 10/20/2018 14:46:35'!
+print
+
+	^'Transferencia por ', self value printString! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -174,6 +198,12 @@ affectBalance: currentBalance
 initializeFor: aTransfer
 
 	transfer _ aTransfer! !
+
+
+!TransferWithdraw methodsFor: 'print' stamp: 'ft 10/20/2018 14:56:50'!
+print
+
+	^'Transferencia por ', self value negated printString! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -219,6 +249,12 @@ affectBalance: currentBalance
 value
 
 	^ value ! !
+
+
+!Withdraw methodsFor: 'print' stamp: 'ft 10/20/2018 14:47:09'!
+print
+
+	^'Extraccion por ', value printString! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -402,10 +438,27 @@ register: aTransaction
 	transactions add: aTransaction 
 ! !
 
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'ft 10/20/2018 14:44:23'!
+summaryLines
+
+	^transactions
+		inject: OrderedCollection new
+		into: [ :lines :transaction | lines add: transaction print. lines]! !
+
 !ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
 transactions 
 
 	^ transactions copy! !
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'ft 10/20/2018 15:25:44'!
+transferNet
+
+	| net |
+	
+	net _ 0.
+	transactions do: [ :transaction | (transaction class superclass = TransferLeg) ifTrue: [net _ transaction affectBalance: net]].
+	
+	^net! !
 
 
 !ReceptiveAccount methodsFor: 'testing' stamp: 'HAW 10/18/2018 16:31:24'!

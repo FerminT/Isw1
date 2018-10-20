@@ -528,15 +528,15 @@ test29ReversePortfolioTreePrinterPrintsTheCompositeStartingFromTheLeaves
 	! !
 
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HAW 5/10/2018 19:22:21'!
+!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/20/2018 14:42:14'!
 accountSummaryLinesOf: aReceptiveAccount 
 	
-	self shouldBeImplemented ! !
+	^aReceptiveAccount summaryLines! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
+!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/20/2018 15:08:02'!
 accountTransferNetOf: aReceptiveAccount 
 	
-	self shouldBeImplemented ! !
+	^aReceptiveAccount transferNet! !
 
 !PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
 investmentEarningsOf: aReceptiveAccount 
@@ -558,10 +558,10 @@ registerCertificateOfDepositOf: anAmount during: aNumberOfDays at: anInteresRate
 
 	self shouldBeImplemented ! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HAW 10/18/2018 16:37:27'!
+!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/20/2018 14:18:37'!
 registerTransferOf: anAmount from: fromAccount to: toAccount
 
-	self shouldBeImplemented ! !
+	^Transfer register: anAmount from: fromAccount to: toAccount! !
 
 !PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
 reversePortofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
