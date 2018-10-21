@@ -38,6 +38,80 @@ register: aValue on: account
 	^ withdraw! !
 
 
+!classDefinition: #CertificateOfDepositLeg category: #'PortfolioTreePrinter-Ejercicio'!
+AccountTransaction subclass: #CertificateOfDepositLeg
+	instanceVariableNames: 'certificateOfDeposit'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!CertificateOfDepositLeg methodsFor: 'value' stamp: 'ft 10/21/2018 16:42:52'!
+affectBalance: currentBalance
+
+	^currentBalance - self value! !
+
+!CertificateOfDepositLeg methodsFor: 'value' stamp: 'ft 10/21/2018 17:03:25'!
+earnings
+
+	^certificateOfDeposit earnings! !
+
+!CertificateOfDepositLeg methodsFor: 'value' stamp: 'ft 10/21/2018 17:18:59'!
+interestRate
+
+	^certificateOfDeposit interestRate! !
+
+!CertificateOfDepositLeg methodsFor: 'value' stamp: 'ft 10/21/2018 17:19:08'!
+timeFrame
+
+	^certificateOfDeposit timeFrame! !
+
+!CertificateOfDepositLeg methodsFor: 'value' stamp: 'ft 10/21/2018 16:42:27'!
+value
+
+	^certificateOfDeposit value! !
+
+
+!CertificateOfDepositLeg methodsFor: 'certificateOfDeposit' stamp: 'ft 10/21/2018 16:43:51'!
+certificateOfDeposit
+
+	^ certificateOfDeposit! !
+
+
+!CertificateOfDepositLeg methodsFor: 'initialization' stamp: 'ft 10/21/2018 16:46:37'!
+initializeFor: aCertificateOfDeposit
+
+	certificateOfDeposit _ aCertificateOfDeposit! !
+
+
+!CertificateOfDepositLeg methodsFor: 'print' stamp: 'ft 10/21/2018 17:22:12'!
+print
+
+	^'Plazo fijo por ', self value printString, 
+	' durante ', self timeFrame printString, 
+	' dias a una tna de ', self interestRate denominator printString, '%'! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'CertificateOfDepositLeg class' category: #'PortfolioTreePrinter-Ejercicio'!
+CertificateOfDepositLeg class
+	instanceVariableNames: ''!
+
+!CertificateOfDepositLeg class methodsFor: 'instance creation' stamp: 'ft 10/21/2018 16:45:59'!
+for: aCertificateOfDeposit
+
+	^self new initializeFor: aCertificateOfDeposit! !
+
+!CertificateOfDepositLeg class methodsFor: 'instance creation' stamp: 'ft 10/21/2018 16:45:23'!
+register: aCertificateOfDeposit on: account
+
+	| certificateOfDepositLeg |
+	
+	certificateOfDepositLeg := self for: aCertificateOfDeposit.
+	account register: certificateOfDepositLeg.
+		
+	^ certificateOfDepositLeg! !
+
+
 !classDefinition: #Deposit category: #'PortfolioTreePrinter-Ejercicio'!
 AccountTransaction subclass: #Deposit
 	instanceVariableNames: 'value'
@@ -278,6 +352,60 @@ register: aValue on: account
 	^ withdraw! !
 
 
+!classDefinition: #CertificateOfDeposit category: #'PortfolioTreePrinter-Ejercicio'!
+Object subclass: #CertificateOfDeposit
+	instanceVariableNames: 'value timeFrame interestRate certificateOfDepositLeg'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!CertificateOfDeposit methodsFor: 'initialization' stamp: 'ft 10/21/2018 16:52:28'!
+initializeWith: anAmount during: anAmountOfDays at: anInterestRate on: account
+
+	value _ anAmount.
+	timeFrame _ anAmountOfDays.
+	interestRate _ anInterestRate.
+	certificateOfDepositLeg _ CertificateOfDepositLeg register: self on: account! !
+
+
+!CertificateOfDeposit methodsFor: 'value' stamp: 'ft 10/21/2018 17:05:04'!
+earnings
+
+	^value * (interestRate / 360) * timeFrame! !
+
+!CertificateOfDeposit methodsFor: 'value' stamp: 'ft 10/21/2018 17:17:58'!
+interestRate
+
+	^interestRate! !
+
+!CertificateOfDeposit methodsFor: 'value' stamp: 'ft 10/21/2018 17:18:11'!
+timeFrame
+
+	^timeFrame! !
+
+!CertificateOfDeposit methodsFor: 'value' stamp: 'ft 10/21/2018 16:59:31'!
+value
+
+	^value! !
+
+
+!CertificateOfDeposit methodsFor: 'accessing' stamp: 'ft 10/21/2018 17:00:10'!
+certificateOfDepositLeg
+
+	^certificateOfDepositLeg! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'CertificateOfDeposit class' category: #'PortfolioTreePrinter-Ejercicio'!
+CertificateOfDeposit class
+	instanceVariableNames: ''!
+
+!CertificateOfDeposit class methodsFor: 'class initialization' stamp: 'ft 10/21/2018 16:51:54'!
+register: anAmount during: anAmountOfDays at: anInterestRate on: account
+
+	^self new initializeWith: anAmount during: anAmountOfDays at: anInterestRate on: account! !
+
+
 !classDefinition: #SummarizingAccount category: #'PortfolioTreePrinter-Ejercicio'!
 Object subclass: #SummarizingAccount
 	instanceVariableNames: ''
@@ -431,6 +559,26 @@ initialize
 balance
 
 	^ transactions inject: 0 into: [ :balance :transaction | transaction affectBalance: balance ]! !
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'ft 10/21/2018 17:11:26'!
+investmentEarnings
+
+	| net |
+	
+	net _ 0.
+	transactions do: [ :transaction | (transaction class = CertificateOfDepositLeg) ifTrue: [net _ net + transaction earnings]].
+	
+	^net! !
+
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'ft 10/21/2018 16:55:57'!
+investmentNet
+
+	| net |
+	
+	net _ 0.
+	transactions do: [ :transaction | (transaction class = CertificateOfDepositLeg) ifTrue: [net _ net + transaction value]].
+	
+	^net! !
 
 !ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
 register: aTransaction

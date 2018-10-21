@@ -538,25 +538,25 @@ accountTransferNetOf: aReceptiveAccount
 	
 	^aReceptiveAccount transferNet! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
+!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/21/2018 17:12:16'!
 investmentEarningsOf: aReceptiveAccount 
 	
-	self shouldBeImplemented ! !
+	^aReceptiveAccount investmentEarnings! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
+!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/21/2018 16:57:57'!
 investmentNetOf: aReceptiveAccount 
 	
-	self shouldBeImplemented ! !
+	^aReceptiveAccount investmentNet! !
 
 !PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
 portofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
 	
 	self shouldBeImplemented ! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HAW 10/18/2018 16:38:05'!
-registerCertificateOfDepositOf: anAmount during: aNumberOfDays at: anInteresRate on: anAccount
+!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/21/2018 16:57:04'!
+registerCertificateOfDepositOf: anAmount during: aNumberOfDays at: anInterestRate on: anAccount
 
-	self shouldBeImplemented ! !
+	^CertificateOfDeposit register: anAmount during: aNumberOfDays at: anInterestRate on: anAccount! !
 
 !PortfolioTest methodsFor: 'test support' stamp: 'ft 10/20/2018 14:18:37'!
 registerTransferOf: anAmount from: fromAccount to: toAccount
