@@ -528,25 +528,25 @@ test29ReversePortfolioTreePrinterPrintsTheCompositeStartingFromTheLeaves
 	! !
 
 
-!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/20/2018 14:42:14'!
+!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/22/2018 19:14:38'!
 accountSummaryLinesOf: aReceptiveAccount 
 	
-	^aReceptiveAccount summaryLines! !
+	^(AccountSummaryLines of: aReceptiveAccount) value! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/20/2018 15:08:02'!
+!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/22/2018 19:25:20'!
 accountTransferNetOf: aReceptiveAccount 
 	
-	^aReceptiveAccount transferNet! !
+	^(AccountTransferNet of: aReceptiveAccount) value! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/21/2018 17:12:16'!
+!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/22/2018 19:39:43'!
 investmentEarningsOf: aReceptiveAccount 
 	
-	^aReceptiveAccount investmentEarnings! !
+	^(AccountInvestmentEarnings of: aReceptiveAccount) value! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/21/2018 16:57:57'!
+!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/22/2018 19:35:02'!
 investmentNetOf: aReceptiveAccount 
 	
-	^aReceptiveAccount investmentNet! !
+	^(AccountInvestmentNet of: aReceptiveAccount) value! !
 
 !PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
 portofolioTreeOf: aPortfolio namingAccountWith: aDictionary 

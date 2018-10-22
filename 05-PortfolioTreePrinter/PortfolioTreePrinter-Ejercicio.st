@@ -21,6 +21,12 @@ print
 
 	self subclassResponsibility ! !
 
+
+!AccountTransaction methodsFor: 'accept' stamp: 'ft 10/22/2018 18:58:06'!
+accept: aVisitor
+
+	self subclassResponsibility ! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'AccountTransaction class' category: #'PortfolioTreePrinter-Ejercicio'!
@@ -83,12 +89,11 @@ initializeFor: aCertificateOfDeposit
 	certificateOfDeposit _ aCertificateOfDeposit! !
 
 
-!CertificateOfDepositLeg methodsFor: 'print' stamp: 'ft 10/21/2018 20:30:10'!
-print
 
-	^'Plazo fijo por ', self value printString, 
-	' durante ', self timeFrame printString, 
-	' dias a una tna de ', (self interestRate * 100) printString, '%'! !
+!CertificateOfDepositLeg methodsFor: 'accept' stamp: 'ft 10/22/2018 18:58:39'!
+accept: aVisitor
+
+	aVisitor visitCertificateOfDepositLeg: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -136,10 +141,11 @@ value
 	^ value! !
 
 
-!Deposit methodsFor: 'print' stamp: 'ft 10/20/2018 14:54:52'!
-print
 
-	^'Deposito por ', value printString! !
+!Deposit methodsFor: 'accept' stamp: 'ft 10/22/2018 18:59:07'!
+accept: aVisitor
+
+	aVisitor visitDeposit: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -187,8 +193,9 @@ transfer
 	^ transfer! !
 
 
-!TransferLeg methodsFor: 'print' stamp: 'ft 10/20/2018 14:46:04'!
-print
+
+!TransferLeg methodsFor: 'accept' stamp: 'ft 10/22/2018 18:59:26'!
+accept: aVisitor
 
 	self subclassResponsibility ! !
 
@@ -228,10 +235,11 @@ initializeFor: aTransfer
 	transfer _ aTransfer! !
 
 
-!TransferDeposit methodsFor: 'print' stamp: 'ft 10/20/2018 14:46:35'!
-print
 
-	^'Transferencia por ', self value printString! !
+!TransferDeposit methodsFor: 'accept' stamp: 'ft 10/22/2018 18:59:41'!
+accept: aVisitor
+
+	aVisitor visitTransferDeposit: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -274,10 +282,11 @@ initializeFor: aTransfer
 	transfer _ aTransfer! !
 
 
-!TransferWithdraw methodsFor: 'print' stamp: 'ft 10/20/2018 14:56:50'!
-print
 
-	^'Transferencia por ', self value negated printString! !
+!TransferWithdraw methodsFor: 'accept' stamp: 'ft 10/22/2018 18:59:58'!
+accept: aVisitor
+
+	aVisitor visitTransferWithdraw: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -325,10 +334,11 @@ value
 	^ value ! !
 
 
-!Withdraw methodsFor: 'print' stamp: 'ft 10/20/2018 14:47:09'!
-print
 
-	^'Extraccion por ', value printString! !
+!Withdraw methodsFor: 'accept' stamp: 'ft 10/22/2018 19:00:11'!
+accept: aVisitor
+
+	aVisitor visitWithdraw: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -350,6 +360,214 @@ register: aValue on: account
 	account register: withdraw.
 		
 	^ withdraw! !
+
+
+!classDefinition: #AccountTransactionsVisitor category: #'PortfolioTreePrinter-Ejercicio'!
+Object subclass: #AccountTransactionsVisitor
+	instanceVariableNames: 'account'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!AccountTransactionsVisitor methodsFor: 'initialization' stamp: 'ft 10/22/2018 19:26:57'!
+initializeOf: anAccount
+
+	account _ anAccount! !
+
+
+!AccountTransactionsVisitor methodsFor: 'value' stamp: 'ft 10/22/2018 19:27:24'!
+value
+
+	self subclassResponsibility ! !
+
+
+!AccountTransactionsVisitor methodsFor: 'visits' stamp: 'ft 10/22/2018 19:28:51'!
+visitCertificateOfDepositLeg: aCertificateOfDepositLeg
+
+	self subclassResponsibility ! !
+
+!AccountTransactionsVisitor methodsFor: 'visits' stamp: 'ft 10/22/2018 19:28:34'!
+visitDeposit: aDeposit
+
+	self subclassResponsibility ! !
+
+!AccountTransactionsVisitor methodsFor: 'visits' stamp: 'ft 10/22/2018 19:28:05'!
+visitTransferDeposit: aTransferDeposit
+
+	self subclassResponsibility ! !
+
+!AccountTransactionsVisitor methodsFor: 'visits' stamp: 'ft 10/22/2018 19:28:17'!
+visitTransferWithdraw: aTransferWIthdraw
+
+	self subclassResponsibility ! !
+
+!AccountTransactionsVisitor methodsFor: 'visits' stamp: 'ft 10/22/2018 19:27:52'!
+visitWithdraw: aWithdraw
+
+	self subclassResponsibility ! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'AccountTransactionsVisitor class' category: #'PortfolioTreePrinter-Ejercicio'!
+AccountTransactionsVisitor class
+	instanceVariableNames: ''!
+
+!AccountTransactionsVisitor class methodsFor: 'class initialization' stamp: 'ft 10/22/2018 19:26:43'!
+of: anAccount
+
+	^self new initializeOf: anAccount! !
+
+
+!classDefinition: #AccountInvestmentEarnings category: #'PortfolioTreePrinter-Ejercicio'!
+AccountTransactionsVisitor subclass: #AccountInvestmentEarnings
+	instanceVariableNames: 'earnings'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!AccountInvestmentEarnings methodsFor: 'visits' stamp: 'ft 10/22/2018 19:38:20'!
+visitCertificateOfDepositLeg: aCertificateOfDepositLeg
+
+	earnings _ earnings + aCertificateOfDepositLeg earnings! !
+
+!AccountInvestmentEarnings methodsFor: 'visits' stamp: 'ft 10/22/2018 19:37:23'!
+visitDeposit: aDeposit! !
+
+!AccountInvestmentEarnings methodsFor: 'visits' stamp: 'ft 10/22/2018 19:37:44'!
+visitTransferDeposit: aTransferDeposit! !
+
+!AccountInvestmentEarnings methodsFor: 'visits' stamp: 'ft 10/22/2018 19:37:53'!
+visitTransferWithdraw: aTransferWithdraw! !
+
+!AccountInvestmentEarnings methodsFor: 'visits' stamp: 'ft 10/22/2018 19:37:33'!
+visitWithdraw: aWithdraw! !
+
+
+!AccountInvestmentEarnings methodsFor: 'value' stamp: 'ft 10/22/2018 19:39:15'!
+value
+
+	earnings _ 0.
+	
+	account visitTransactionsWith: self.
+	
+	^earnings! !
+
+
+!classDefinition: #AccountInvestmentNet category: #'PortfolioTreePrinter-Ejercicio'!
+AccountTransactionsVisitor subclass: #AccountInvestmentNet
+	instanceVariableNames: 'net'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!AccountInvestmentNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:33:52'!
+visitCertificateOfDepositLeg: aCertificateOfDepositLeg
+
+	net _ net + aCertificateOfDepositLeg value! !
+
+!AccountInvestmentNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:31:44'!
+visitDeposit: aDeposit! !
+
+!AccountInvestmentNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:32:07'!
+visitTransferDeposit: aTransferDeposit! !
+
+!AccountInvestmentNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:32:15'!
+visitTransferWithdraw: aTransferWithdraw! !
+
+!AccountInvestmentNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:31:53'!
+visitWithdraw: aWithdraw! !
+
+
+!AccountInvestmentNet methodsFor: 'value' stamp: 'ft 10/22/2018 19:34:23'!
+value
+
+	net _ 0.
+	
+	account visitTransactionsWith: self.
+	
+	^net! !
+
+
+!classDefinition: #AccountSummaryLines category: #'PortfolioTreePrinter-Ejercicio'!
+AccountTransactionsVisitor subclass: #AccountSummaryLines
+	instanceVariableNames: 'lines'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!AccountSummaryLines methodsFor: 'value' stamp: 'ft 10/22/2018 19:17:03'!
+value
+
+	lines _ OrderedCollection new.
+	
+	account visitTransactionsWith: self.
+	
+	^lines! !
+
+
+!AccountSummaryLines methodsFor: 'visits' stamp: 'ft 10/22/2018 19:12:55'!
+visitCertificateOfDepositLeg: aCertificateOfDeposit
+
+	^lines add: 'Plazo fijo por ', aCertificateOfDeposit value printString, 
+		' durante ', aCertificateOfDeposit timeFrame printString, 
+		' dias a una tna de ', (aCertificateOfDeposit interestRate * 100) printString, '%'! !
+
+!AccountSummaryLines methodsFor: 'visits' stamp: 'ft 10/22/2018 19:13:02'!
+visitDeposit: aDeposit
+
+	^lines add: 'Deposito por ', aDeposit value printString! !
+
+!AccountSummaryLines methodsFor: 'visits' stamp: 'ft 10/22/2018 19:13:08'!
+visitTransferDeposit: aTransferDeposit
+
+	^lines add: 'Transferencia por ', aTransferDeposit value printString! !
+
+!AccountSummaryLines methodsFor: 'visits' stamp: 'ft 10/22/2018 19:13:14'!
+visitTransferWithdraw: aTransferWithdraw
+
+	^lines add: 'Transferencia por ', aTransferWithdraw value negated printString! !
+
+!AccountSummaryLines methodsFor: 'visits' stamp: 'ft 10/22/2018 19:13:28'!
+visitWithdraw: aWithdraw
+
+	^lines add: 'Extraccion por ', aWithdraw value printString! !
+
+
+!classDefinition: #AccountTransferNet category: #'PortfolioTreePrinter-Ejercicio'!
+AccountTransactionsVisitor subclass: #AccountTransferNet
+	instanceVariableNames: 'net'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!AccountTransferNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:22:03'!
+visitCertificateOfDepositLeg: aCertificateOfDepositLeg! !
+
+!AccountTransferNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:21:32'!
+visitDeposit: aDeposit! !
+
+!AccountTransferNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:23:28'!
+visitTransferDeposit: aTransferDeposit
+
+	net _ aTransferDeposit affectBalance: net! !
+
+!AccountTransferNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:24:26'!
+visitTransferWithdraw: aTransferWithdraw
+
+	net _ aTransferWithdraw affectBalance: net! !
+
+!AccountTransferNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:21:44'!
+visitWithdraw: aWithdraw! !
+
+
+!AccountTransferNet methodsFor: 'value' stamp: 'ft 10/22/2018 19:24:55'!
+value
+
+	net _ 0.
+	
+	account visitTransactionsWith: self.
+	
+	^net! !
 
 
 !classDefinition: #CertificateOfDeposit category: #'PortfolioTreePrinter-Ejercicio'!
@@ -560,53 +778,21 @@ balance
 
 	^ transactions inject: 0 into: [ :balance :transaction | transaction affectBalance: balance ]! !
 
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'ft 10/21/2018 17:11:26'!
-investmentEarnings
-
-	| net |
-	
-	net _ 0.
-	transactions do: [ :transaction | (transaction class = CertificateOfDepositLeg) ifTrue: [net _ net + transaction earnings]].
-	
-	^net! !
-
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'ft 10/21/2018 16:55:57'!
-investmentNet
-
-	| net |
-	
-	net _ 0.
-	transactions do: [ :transaction | (transaction class = CertificateOfDepositLeg) ifTrue: [net _ net + transaction value]].
-	
-	^net! !
-
 !ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
 register: aTransaction
 
 	transactions add: aTransaction 
 ! !
 
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'ft 10/20/2018 14:44:23'!
-summaryLines
-
-	^transactions
-		inject: OrderedCollection new
-		into: [ :lines :transaction | lines add: transaction print. lines]! !
-
 !ReceptiveAccount methodsFor: 'transactions' stamp: 'HernanWilkinson 7/13/2011 18:37'!
 transactions 
 
 	^ transactions copy! !
 
-!ReceptiveAccount methodsFor: 'transactions' stamp: 'ft 10/20/2018 15:25:44'!
-transferNet
+!ReceptiveAccount methodsFor: 'transactions' stamp: 'ft 10/22/2018 19:16:42'!
+visitTransactionsWith: aVisitor
 
-	| net |
-	
-	net _ 0.
-	transactions do: [ :transaction | (transaction class superclass = TransferLeg) ifTrue: [net _ transaction affectBalance: net]].
-	
-	^net! !
+	transactions do: [ :transaction | transaction accept: aVisitor]! !
 
 
 !ReceptiveAccount methodsFor: 'testing' stamp: 'HAW 10/18/2018 16:31:24'!
