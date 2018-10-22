@@ -83,12 +83,12 @@ initializeFor: aCertificateOfDeposit
 	certificateOfDeposit _ aCertificateOfDeposit! !
 
 
-!CertificateOfDepositLeg methodsFor: 'print' stamp: 'ft 10/21/2018 17:22:12'!
+!CertificateOfDepositLeg methodsFor: 'print' stamp: 'ft 10/21/2018 20:30:10'!
 print
 
 	^'Plazo fijo por ', self value printString, 
 	' durante ', self timeFrame printString, 
-	' dias a una tna de ', self interestRate denominator printString, '%'! !
+	' dias a una tna de ', (self interestRate * 100) printString, '%'! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
