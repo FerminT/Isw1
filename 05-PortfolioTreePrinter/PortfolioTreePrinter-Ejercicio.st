@@ -546,15 +546,15 @@ visitCertificateOfDepositLeg: aCertificateOfDepositLeg! !
 !AccountTransferNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:21:32'!
 visitDeposit: aDeposit! !
 
-!AccountTransferNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:23:28'!
+!AccountTransferNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:44:31'!
 visitTransferDeposit: aTransferDeposit
 
-	net _ aTransferDeposit affectBalance: net! !
+	net _ net + aTransferDeposit value! !
 
-!AccountTransferNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:24:26'!
+!AccountTransferNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:44:47'!
 visitTransferWithdraw: aTransferWithdraw
 
-	net _ aTransferWithdraw affectBalance: net! !
+	net _ net - aTransferWithdraw value! !
 
 !AccountTransferNet methodsFor: 'visits' stamp: 'ft 10/22/2018 19:21:44'!
 visitWithdraw: aWithdraw! !
@@ -652,6 +652,17 @@ transactions
 
 	self subclassResponsibility ! !
 
+
+!SummarizingAccount methodsFor: 'accept' stamp: 'ft 10/22/2018 19:57:45'!
+accept
+
+	self subclassResponsibility ! !
+
+!SummarizingAccount methodsFor: 'accept' stamp: 'ft 10/22/2018 19:58:08'!
+accept: aVisitor
+
+	self subclassResponsibility ! !
+
 
 !classDefinition: #Portfolio category: #'PortfolioTreePrinter-Ejercicio'!
 SummarizingAccount subclass: #Portfolio
@@ -703,6 +714,19 @@ transactionsOf: anAccount
 initializeWithAll: aCollectionOfAccounts
 
 	accounts := aCollectionOfAccounts   ! !
+
+
+!Portfolio methodsFor: 'accept' stamp: 'ft 10/22/2018 19:58:22'!
+accept: aVisitor
+
+	aVisitor visitPortfolio: self! !
+
+
+!Portfolio methodsFor: 'visitors' stamp: 'ft 10/22/2018 20:08:07'!
+visitAccountsWith: aVisitor
+
+	" Acá hay que decidir si yo elijo a qué cuentas debe visitar el visitor (en qué orden), o si directamente lo mando a 'visitar' a cada una de las cuentas y que él decida el orden
+	Lo primero parece tener más sentido"! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -806,6 +830,58 @@ hasRegistered: aTtransaction
 
 	^ transactions includes: aTtransaction 
 ! !
+
+
+!ReceptiveAccount methodsFor: 'accept' stamp: 'ft 10/22/2018 19:58:40'!
+accept: aVisitor
+
+	aVisitor visitReceptiveAccount: self! !
+
+
+!classDefinition: #SummarizingAccountVisitor category: #'PortfolioTreePrinter-Ejercicio'!
+Object subclass: #SummarizingAccountVisitor
+	instanceVariableNames: 'account accountsNames lines'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTreePrinter-Ejercicio'!
+
+!SummarizingAccountVisitor methodsFor: 'initialization' stamp: 'ft 10/22/2018 19:52:41'!
+initializeOf: anAccount with: aDictionary
+
+	account _ anAccount.
+	accountsNames _ aDictionary! !
+
+
+!SummarizingAccountVisitor methodsFor: 'value' stamp: 'ft 10/22/2018 19:56:02'!
+value
+
+	lines _ OrderedCollection new.
+	
+	account visitWith: self.
+	
+	^lines! !
+
+
+!SummarizingAccountVisitor methodsFor: 'visits' stamp: 'ft 10/22/2018 20:08:26'!
+visitPortfolio: aPortfolio
+
+	"Agregar lógica para los espacios y eso"
+
+	aPortfolio visitAccountsWith: self! !
+
+!SummarizingAccountVisitor methodsFor: 'visits' stamp: 'ft 10/22/2018 19:54:02'!
+visitReceptiveAccount: aReceptiveAccount! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'SummarizingAccountVisitor class' category: #'PortfolioTreePrinter-Ejercicio'!
+SummarizingAccountVisitor class
+	instanceVariableNames: ''!
+
+!SummarizingAccountVisitor class methodsFor: 'class initialization' stamp: 'ft 10/22/2018 19:51:59'!
+of: anAccount with: aDictionary
+
+	^self new initializeOf: anAccount with: aDictionary! !
 
 
 !classDefinition: #Transfer category: #'PortfolioTreePrinter-Ejercicio'!

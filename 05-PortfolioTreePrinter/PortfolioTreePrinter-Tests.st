@@ -548,10 +548,10 @@ investmentNetOf: aReceptiveAccount
 	
 	^(AccountInvestmentNet of: aReceptiveAccount) value! !
 
-!PortfolioTest methodsFor: 'test support' stamp: 'HernanWilkinson 9/6/2016 19:43'!
+!PortfolioTest methodsFor: 'test support' stamp: 'ft 10/22/2018 19:54:41'!
 portofolioTreeOf: aPortfolio namingAccountWith: aDictionary 
 	
-	self shouldBeImplemented ! !
+	^(SummarizingAccountVisitor of: aPortfolio with: aDictionary) value! !
 
 !PortfolioTest methodsFor: 'test support' stamp: 'ft 10/21/2018 16:57:04'!
 registerCertificateOfDepositOf: anAmount during: aNumberOfDays at: anInterestRate on: anAccount
