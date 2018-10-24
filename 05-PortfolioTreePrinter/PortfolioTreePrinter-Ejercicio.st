@@ -554,11 +554,11 @@ visitTransferWithdraw: aTransferWithdraw
 visitWithdraw: aWithdraw! !
 
 
-!AccountTransferNet methodsFor: 'value' stamp: 'ft 10/22/2018 19:24:55'!
+!AccountTransferNet methodsFor: 'value' stamp: 'ft 10/24/2018 11:41:08'!
 value
 
 	net _ 0.
-	
+
 	account visitTransactionsWith: self.
 	
 	^net! !
@@ -717,11 +717,10 @@ accept: aVisitor
 	aVisitor visitPortfolio: self! !
 
 
-!Portfolio methodsFor: 'visitors' stamp: 'ft 10/22/2018 20:08:07'!
+!Portfolio methodsFor: 'visitors' stamp: 'ft 10/24/2018 12:15:40'!
 visitAccountsWith: aVisitor
-
-	" Acá hay que decidir si yo elijo a qué cuentas debe visitar el visitor (en qué orden), o si directamente lo mando a 'visitar' a cada una de las cuentas y que él decida el orden
-	Lo primero parece tener más sentido"! !
+	
+	accounts do: [ :account | account accept: aVisitor]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -841,7 +840,7 @@ visitAccountsWith: aVisitor
 
 !classDefinition: #SummarizingAccountVisitor category: #'PortfolioTreePrinter-Ejercicio'!
 Object subclass: #SummarizingAccountVisitor
-	instanceVariableNames: 'account accountsNames lines'
+	instanceVariableNames: 'account accountsNames lines level'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'PortfolioTreePrinter-Ejercicio'!
@@ -853,25 +852,39 @@ initializeOf: anAccount with: aDictionary
 	accountsNames _ aDictionary! !
 
 
-!SummarizingAccountVisitor methodsFor: 'value' stamp: 'ft 10/24/2018 10:50:01'!
+!SummarizingAccountVisitor methodsFor: 'value' stamp: 'ft 10/24/2018 12:37:14'!
 value
 
 	lines _ OrderedCollection new.
-	
+	level _ 1.
+		
+	lines add: (accountsNames at: account).
 	account visitAccountsWith: self.
 	
 	^lines! !
 
 
-!SummarizingAccountVisitor methodsFor: 'visits' stamp: 'ft 10/22/2018 20:08:26'!
+!SummarizingAccountVisitor methodsFor: 'visits' stamp: 'ft 10/24/2018 12:40:38'!
 visitPortfolio: aPortfolio
 
-	"Agregar lógica para los espacios y eso"
+	lines add: (self spaces: level), (accountsNames at: aPortfolio).
 
-	aPortfolio visitAccountsWith: self! !
+	level _ level + 1.
+	
+	aPortfolio visitAccountsWith: self.
+	
+	level _ level - 1! !
 
-!SummarizingAccountVisitor methodsFor: 'visits' stamp: 'ft 10/22/2018 19:54:02'!
-visitReceptiveAccount: aReceptiveAccount! !
+!SummarizingAccountVisitor methodsFor: 'visits' stamp: 'ft 10/24/2018 12:40:46'!
+visitReceptiveAccount: aReceptiveAccount
+
+	lines add: (self spaces: level), (accountsNames at: aReceptiveAccount)! !
+
+
+!SummarizingAccountVisitor methodsFor: 'spaces' stamp: 'ft 10/24/2018 12:40:07'!
+spaces: anAmount
+
+	^String new: anAmount withAll: Character space.! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
