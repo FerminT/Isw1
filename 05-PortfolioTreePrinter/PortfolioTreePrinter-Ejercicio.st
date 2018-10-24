@@ -89,7 +89,6 @@ initializeFor: aCertificateOfDeposit
 	certificateOfDeposit _ aCertificateOfDeposit! !
 
 
-
 !CertificateOfDepositLeg methodsFor: 'accept' stamp: 'ft 10/22/2018 18:58:39'!
 accept: aVisitor
 
@@ -139,7 +138,6 @@ affectBalance: currentBalance
 value
 
 	^ value! !
-
 
 
 !Deposit methodsFor: 'accept' stamp: 'ft 10/22/2018 18:59:07'!
@@ -193,7 +191,6 @@ transfer
 	^ transfer! !
 
 
-
 !TransferLeg methodsFor: 'accept' stamp: 'ft 10/22/2018 18:59:26'!
 accept: aVisitor
 
@@ -233,7 +230,6 @@ affectBalance: currentBalance
 initializeFor: aTransfer
 
 	transfer _ aTransfer! !
-
 
 
 !TransferDeposit methodsFor: 'accept' stamp: 'ft 10/22/2018 18:59:41'!
@@ -280,7 +276,6 @@ affectBalance: currentBalance
 initializeFor: aTransfer
 
 	transfer _ aTransfer! !
-
 
 
 !TransferWithdraw methodsFor: 'accept' stamp: 'ft 10/22/2018 18:59:58'!
@@ -332,7 +327,6 @@ affectBalance: currentBalance
 value
 
 	^ value ! !
-
 
 
 !Withdraw methodsFor: 'accept' stamp: 'ft 10/22/2018 19:00:11'!
@@ -653,13 +647,14 @@ transactions
 	self subclassResponsibility ! !
 
 
-!SummarizingAccount methodsFor: 'accept' stamp: 'ft 10/22/2018 19:57:45'!
-accept
+!SummarizingAccount methodsFor: 'accept' stamp: 'ft 10/22/2018 19:58:08'!
+accept: aVisitor
 
 	self subclassResponsibility ! !
 
-!SummarizingAccount methodsFor: 'accept' stamp: 'ft 10/22/2018 19:58:08'!
-accept: aVisitor
+
+!SummarizingAccount methodsFor: 'visitors' stamp: 'ft 10/24/2018 10:51:12'!
+visitAccountsWith: aVisitor
 
 	self subclassResponsibility ! !
 
@@ -837,6 +832,12 @@ accept: aVisitor
 
 	aVisitor visitReceptiveAccount: self! !
 
+
+!ReceptiveAccount methodsFor: 'visitors' stamp: 'ft 10/24/2018 10:59:30'!
+visitAccountsWith: aVisitor
+
+	self accept: aVisitor! !
+
 
 !classDefinition: #SummarizingAccountVisitor category: #'PortfolioTreePrinter-Ejercicio'!
 Object subclass: #SummarizingAccountVisitor
@@ -852,12 +853,12 @@ initializeOf: anAccount with: aDictionary
 	accountsNames _ aDictionary! !
 
 
-!SummarizingAccountVisitor methodsFor: 'value' stamp: 'ft 10/22/2018 19:56:02'!
+!SummarizingAccountVisitor methodsFor: 'value' stamp: 'ft 10/24/2018 10:50:01'!
 value
 
 	lines _ OrderedCollection new.
 	
-	account visitWith: self.
+	account visitAccountsWith: self.
 	
 	^lines! !
 
