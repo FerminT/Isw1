@@ -499,12 +499,12 @@ value
 	^lines! !
 
 
-!AccountSummaryLines methodsFor: 'visits' stamp: 'ft 10/22/2018 19:12:55'!
-visitCertificateOfDepositLeg: aCertificateOfDeposit
+!AccountSummaryLines methodsFor: 'visits' stamp: 'ft 10/25/2018 11:33:17'!
+visitCertificateOfDepositLeg: aCertificateOfDepositLeg
 
-	^lines add: 'Plazo fijo por ', aCertificateOfDeposit value printString, 
-		' durante ', aCertificateOfDeposit timeFrame printString, 
-		' dias a una tna de ', (aCertificateOfDeposit interestRate * 100) printString, '%'! !
+	^lines add: 'Plazo fijo por ', aCertificateOfDepositLeg value printString, 
+		' durante ', aCertificateOfDepositLeg timeFrame printString, 
+		' dias a una tna de ', (aCertificateOfDepositLeg interestRate * 100) printString, '%'! !
 
 !AccountSummaryLines methodsFor: 'visits' stamp: 'ft 10/22/2018 19:13:02'!
 visitDeposit: aDeposit
@@ -881,7 +881,7 @@ visitReceptiveAccount: aReceptiveAccount
 	lines add: (self spaces: level), (accountsNames at: aReceptiveAccount)! !
 
 
-!SummarizingAccountVisitor methodsFor: 'spaces' stamp: 'ft 10/24/2018 12:40:07'!
+!SummarizingAccountVisitor methodsFor: 'spaces - private' stamp: 'ft 10/24/2018 12:40:07'!
 spaces: anAmount
 
 	^String new: anAmount withAll: Character space.! !
