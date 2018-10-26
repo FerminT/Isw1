@@ -11,19 +11,16 @@ initializeFor: aReceptiveAccount
 	account := aReceptiveAccount ! !
 
 
-!AccountSummaryWithAllInvestmentInformation methodsFor: 'evaluating' stamp: 'ft 10/26/2018 10:49:36'!
+!AccountSummaryWithAllInvestmentInformation methodsFor: 'evaluation' stamp: 'ft 10/26/2018 14:01:03'!
 lines 
 
-	| lines investmentEarnings semaphore |
+	| lines investmentEarnings investmentNetVisitorValue accountSummaryWithInvestmentEarningsValue |
 	
-	semaphore := Semaphore new.
+	investmentNetVisitorValue := [investmentEarnings := (InvestmentNetVisitor for: account) value].
+	accountSummaryWithInvestmentEarningsValue := [lines := (AccountSummaryWithInvestmentEarnings for: account) lines].
 	
-	[[investmentEarnings := (InvestmentNetVisitor for: account) value] ensure: [semaphore signal]] fork.
-	[[lines := (AccountSummaryWithInvestmentEarnings for: account) lines] ensure: [semaphore signal]] fork.
-	
-	semaphore wait.
-	semaphore wait.
-	
+	(ParallelProcesses with: investmentNetVisitorValue with: accountSummaryWithInvestmentEarningsValue) executeAndWait.
+
 	lines add: 'Inversiones por ', investmentEarnings printString.
 	
 	 ^ lines! !
@@ -53,18 +50,15 @@ initializeFor: aReceptiveAccount
 	account := aReceptiveAccount ! !
 
 
-!AccountSummaryWithInvestmentEarnings methodsFor: 'evaluating' stamp: 'ft 10/26/2018 10:47:09'!
+!AccountSummaryWithInvestmentEarnings methodsFor: 'evaluation' stamp: 'ft 10/26/2018 13:58:12'!
 lines 
 
-	| lines investmentEarnings semaphore |
+	| lines investmentEarnings investmentEarningVisitorValue accountSummaryLines |
 	
-	semaphore := Semaphore new.
+	investmentEarningVisitorValue := [investmentEarnings := (InvestmentEarningVisitor for: account) value].
+	accountSummaryLines := [lines := (AccountSummary for: account) lines].
 	
-	[[investmentEarnings := (InvestmentEarningVisitor for: account) value] ensure: [semaphore signal]] fork.
-	[[lines := (AccountSummary for: account) lines] ensure: [semaphore signal]] fork.
-	
-	semaphore wait.
-	semaphore wait.
+	(ParallelProcesses with: investmentEarningVisitorValue with: accountSummaryLines) executeAndWait.
 	
 	lines add: 'Ganancias por ', investmentEarnings printString.
 	
@@ -682,6 +676,45 @@ InvestmentNetVisitor class
 for: aReceptiveAccount 
 	
 	^ self new initializeFor: aReceptiveAccount ! !
+
+
+!classDefinition: #ParallelProcesses category: #'PortfolioTimeConsuming-Ejercicio'!
+Object subclass: #ParallelProcesses
+	instanceVariableNames: 'processes semaphore'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'PortfolioTimeConsuming-Ejercicio'!
+
+!ParallelProcesses methodsFor: 'initialization' stamp: 'ft 10/26/2018 13:50:02'!
+initializeWithAll: aCollectionOfBlockClosures
+
+	processes := aCollectionOfBlockClosures! !
+
+
+!ParallelProcesses methodsFor: 'evaluation' stamp: 'ft 10/26/2018 13:33:58'!
+executeAndWait
+
+	semaphore := Semaphore new.
+	
+	processes do: [ :blockClosure | [blockClosure ensure: [semaphore signal]] fork].
+	
+	processes size timesRepeat: [semaphore wait]! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'ParallelProcesses class' category: #'PortfolioTimeConsuming-Ejercicio'!
+ParallelProcesses class
+	instanceVariableNames: ''!
+
+!ParallelProcesses class methodsFor: 'class initialization' stamp: 'ft 10/26/2018 13:49:22'!
+with: leftBlockClosure with: rightBlockClosure
+
+	^self withAll: (Array with: leftBlockClosure with: rightBlockClosure)! !
+
+!ParallelProcesses class methodsFor: 'class initialization' stamp: 'ft 10/26/2018 13:50:02'!
+withAll: aCollectionOfBlockClosures
+
+	^self new initializeWithAll: aCollectionOfBlockClosures! !
 
 
 !classDefinition: #ReversePortfolioTreePrinter category: #'PortfolioTimeConsuming-Ejercicio'!
