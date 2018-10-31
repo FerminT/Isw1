@@ -11,15 +11,15 @@ initializeFor: aReceptiveAccount
 	account := aReceptiveAccount ! !
 
 
-!AccountSummaryWithAllInvestmentInformation methodsFor: 'evaluation' stamp: 'ft 10/26/2018 14:01:03'!
+!AccountSummaryWithAllInvestmentInformation methodsFor: 'evaluation' stamp: 'ft 10/31/2018 10:21:13'!
 lines 
 
-	| lines investmentEarnings investmentNetVisitorValue accountSummaryWithInvestmentEarningsValue |
+	| lines investmentEarnings investmentNetVisitorValue accountSummaryWithInvestmentEarningsLines |
 	
 	investmentNetVisitorValue := [investmentEarnings := (InvestmentNetVisitor for: account) value].
-	accountSummaryWithInvestmentEarningsValue := [lines := (AccountSummaryWithInvestmentEarnings for: account) lines].
+	accountSummaryWithInvestmentEarningsLines := [lines := (AccountSummaryWithInvestmentEarnings for: account) lines].
 	
-	(ParallelProcesses with: investmentNetVisitorValue with: accountSummaryWithInvestmentEarningsValue) executeAndWait.
+	(ParallelProcesses with: investmentNetVisitorValue with: accountSummaryWithInvestmentEarningsLines) executeAndWait.
 
 	lines add: 'Inversiones por ', investmentEarnings printString.
 	
