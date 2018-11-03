@@ -152,6 +152,20 @@ test09PonerTresFichasEnLineaDiagonalTerminaElJuego
 			self assert: TerniLapilli errorJuegoTerminado = tableroInvalido messageText ].
 	! !
 
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/3/2018 14:55:46'!
+test10NoSePuedePonerFichaFueraDelTablero
+
+	| tablero |
+
+	tablero := TerniLapilli new.
+	
+	self
+		should: [tablero ponerCruzEn: 4@2]
+		raise: Error
+		withExceptionDo: [ :tableroInvalido |
+			self assert: TerniLapilli errorPosicionInvalida = tableroInvalido messageText ].
+	! !
+
 
 !classDefinition: #TerniLapilli category: #TerniLapilli!
 Object subclass: #TerniLapilli
@@ -160,11 +174,7 @@ Object subclass: #TerniLapilli
 	poolDictionaries: ''
 	category: 'TerniLapilli'!
 
-!TerniLapilli methodsFor: 'operations' stamp: 'ft 11/2/2018 10:25:09'!
-cambiarTurno
-	turno := turno bitXor: 3! !
-
-!TerniLapilli methodsFor: 'operations' stamp: 'ft 11/2/2018 16:42:38'!
+!TerniLapilli methodsFor: 'operations' stamp: 'ft 11/3/2018 14:58:08'!
 ponerCirculoEn: posicion
 	
 	| circulosHorizontal circulosVertical circulosDiagonal |
@@ -172,6 +182,7 @@ ponerCirculoEn: posicion
 	estado = 0 ifFalse: [^self error: self class errorJuegoTerminado].
 	turno = 1 ifTrue: [^self error: self class errorJugadaSinTurno].
 	(self cantidadFichasEnTablero = 6) ifTrue: [^self error: self class errorNoHayMasFichas].
+	self verificarPosicion: posicion.
 	(self fichaVaciaEn: posicion) ifFalse: [^self error: self class errorPosicionOcupada].
 	
 	matriz i: posicion x j: posicion y put: 2.
@@ -197,7 +208,7 @@ ponerCirculoEn: posicion
 			
 	self cambiarTurno! !
 
-!TerniLapilli methodsFor: 'operations' stamp: 'ft 11/2/2018 16:39:33'!
+!TerniLapilli methodsFor: 'operations' stamp: 'ft 11/3/2018 14:58:20'!
 ponerCruzEn: posicion
 
 	| crucesHorizontal crucesVertical crucesDiagonal |
@@ -205,6 +216,7 @@ ponerCruzEn: posicion
 	estado = 0 ifFalse: [^self error: self class errorJuegoTerminado].
 	turno = 2 ifTrue: [^self error: self class errorJugadaSinTurno].
 	(self cantidadFichasEnTablero = 6) ifTrue: [^self error: self class errorNoHayMasFichas].
+	self verificarPosicion: posicion.
 	(self fichaVaciaEn: posicion) ifFalse: [^self error: self class errorPosicionOcupada].
 	
 	matriz i: posicion x j: posicion y put: 1.
@@ -289,6 +301,17 @@ cantidadFichasEnTablero
 
 	^self cantidadCrucesEnTablero + self cantidadCirculosEnTablero! !
 
+
+!TerniLapilli methodsFor: 'validation - private' stamp: 'ft 11/3/2018 15:01:33'!
+verificarPosicion: posicion
+
+	((posicion x between: 1 and: 3) and: [posicion y between: 1 and: 3]) ifFalse: [^self error: self class errorPosicionInvalida]! !
+
+
+!TerniLapilli methodsFor: 'operations - private' stamp: 'ft 11/2/2018 10:25:09'!
+cambiarTurno
+	turno := turno bitXor: 3! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'TerniLapilli class' category: #TerniLapilli!
@@ -309,6 +332,11 @@ errorJugadaSinTurno
 errorNoHayMasFichas
 
 	^ 'No se pueden poner más fichas en el tablero'! !
+
+!TerniLapilli class methodsFor: 'error messages' stamp: 'ft 11/3/2018 15:02:39'!
+errorPosicionInvalida
+
+	^'La posicion no representa un punto del tablero'! !
 
 !TerniLapilli class methodsFor: 'error messages' stamp: 'LTO 11/1/2018 20:15:23'!
 errorPosicionOcupada
