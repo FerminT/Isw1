@@ -225,6 +225,94 @@ test13NoSePuedeMoverFichaAPosicionNoConsecutiva
 			self assert: TerniLapilli errorMovimientoInvalido = tableroInvalido messageText]
 	! !
 
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:29:55'!
+test14MoverTresFichasEnLineaHorizontalTerminaElJuego
+
+	| tablero |
+
+	tablero := TerniLapilli new.
+	
+	tablero ponerCruzEn: 1@1.
+	tablero ponerCirculoEn: 2@1.
+	tablero ponerCruzEn: 1@2.
+	tablero ponerCirculoEn: 3@2.
+	tablero ponerCruzEn: 2@3.
+	tablero ponerCirculoEn: 3@1.
+	tablero moverCruzEn: 2@3 a: 1@3.
+	
+	self
+		should: [tablero moverCirculoEn: 2@1 a: 2@2.]
+		raise: Error
+		withExceptionDo: [ :tableroInvalido |
+			self assert: TerniLapilli errorJuegoTerminado = tableroInvalido messageText ].
+	! !
+
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:30:07'!
+test15MoverTresFichasEnLineaVerticalTerminaElJuego
+
+	| tablero |
+
+	tablero := TerniLapilli new.
+	
+	tablero ponerCruzEn: 1@2.
+	tablero ponerCirculoEn: 1@1.
+	tablero ponerCruzEn: 2@2.
+	tablero ponerCirculoEn: 1@3.
+	tablero ponerCruzEn: 3@3.
+	tablero ponerCirculoEn: 3@1.
+	tablero moverCruzEn: 3@3 a: 3@2.
+	
+	self
+		should: [tablero moverCirculoEn: 3@1 a: 2@1]
+		raise: Error
+		withExceptionDo: [ :tableroInvalido |
+			self assert: TerniLapilli errorJuegoTerminado = tableroInvalido messageText ].
+	! !
+
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:31:29'!
+test16MoverTresFichasEnLineaDiagonalTerminaElJuego
+
+	| tablero |
+
+	tablero := TerniLapilli new.
+	
+	tablero ponerCruzEn: 1@3.
+	tablero ponerCirculoEn: 2@1.
+	tablero ponerCruzEn: 2@2.
+	tablero ponerCirculoEn: 2@3.
+	tablero ponerCruzEn: 3@2.
+	tablero ponerCirculoEn: 1@2.
+	tablero moverCruzEn: 3@2 a: 3@1.
+	
+	self
+		should: [tablero moverCirculoEn: 2@1 a: 1@1]
+		raise: Error
+		withExceptionDo: [ :tableroInvalido |
+			self assert: TerniLapilli errorJuegoTerminado = tableroInvalido messageText ].
+	! !
+
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:32:35'!
+test17MoverTresFichasEnLineaDiagonalInversaTerminaElJuego
+
+	| tablero |
+
+	tablero := TerniLapilli new.
+	
+	tablero ponerCruzEn: 3@1.
+	tablero ponerCirculoEn: 1@2.
+	tablero ponerCruzEn: 2@2.
+	tablero ponerCirculoEn: 3@2.
+	tablero ponerCruzEn: 2@3.
+	tablero ponerCirculoEn: 2@1.
+	tablero moverCruzEn: 2@3 a: 1@3.
+	
+	self
+		should: [tablero moverCirculoEn: 1@2 a: 1@1]
+		raise: Error
+		withExceptionDo: [ :tableroInvalido |
+			self assert: TerniLapilli errorJuegoTerminado = tableroInvalido messageText ].
+	! !
+
 
 !classDefinition: #TerniLapilli category: #TerniLapilli!
 Object subclass: #TerniLapilli
