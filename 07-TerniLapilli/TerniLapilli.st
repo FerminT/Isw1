@@ -16,7 +16,7 @@ test01TableroNuevoTieneTodasLasPosicionesVacias
 	1 to: 3 do: [:x | 1 to: 3 do: [:y | self deny: (tablero fichaCruzEn: x@y)]].
 	1 to: 3 do: [:x | 1 to: 3 do: [:y | self deny: (tablero fichaCirculoEn: x@y)]]! !
 
-!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/2/2018 16:01:33'!
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 09:58:59'!
 test02PrimeraJugadaPoneCruzEnPosicionYDejaVaciaLasDemas
 
 	| tablero |
@@ -24,18 +24,20 @@ test02PrimeraJugadaPoneCruzEnPosicionYDejaVaciaLasDemas
 	tablero := TerniLapilli new.
 	
 	tablero ponerCruzEn: 1@1.
+	
 	self assert: (tablero fichaCruzEn: 1@1).
 	self assert: (tablero fichaVaciaEn: 1@2).
 	self assert: (tablero fichaVaciaEn: 1@3).
 	2 to: 3 do: [:x | 1 to: 3 do: [:y | self assert: (tablero fichaVaciaEn: x@y)]]
 	! !
 
-!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/2/2018 16:01:29'!
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 09:59:07'!
 test03NoPuedeJugarPrimeroCirculo
 
 	| tablero |
 
 	tablero := TerniLapilli new.
+	
 	self
 		should: [tablero ponerCirculoEn: 1@1]
 		raise: Error
@@ -43,13 +45,15 @@ test03NoPuedeJugarPrimeroCirculo
 			self assert: TerniLapilli errorJugadaSinTurno = tableroInvalido messageText ].
 	! !
 
-!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/2/2018 16:01:25'!
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 09:59:15'!
 test04NoPuedeJugarSegundoCruz
 
 	| tablero |
 
 	tablero := TerniLapilli new.
+	
 	tablero ponerCruzEn: 1@1.
+	
 	self
 		should: [tablero ponerCruzEn: 2@1]
 		raise: Error
@@ -57,13 +61,15 @@ test04NoPuedeJugarSegundoCruz
 			self assert: TerniLapilli errorJugadaSinTurno = tableroInvalido messageText ].
 	! !
 
-!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/2/2018 16:01:20'!
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 09:59:21'!
 test05NoPuedePonerFichaEnPosicionOcupada
 
 	| tablero |
 
 	tablero := TerniLapilli new.
+	
 	tablero ponerCruzEn: 2@2.
+	
 	self
 		should: [tablero ponerCirculoEn: 2@2]
 		raise: Error
@@ -71,7 +77,7 @@ test05NoPuedePonerFichaEnPosicionOcupada
 			self assert: TerniLapilli errorPosicionOcupada = tableroInvalido messageText ].
 	! !
 
-!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:33:04'!
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 10:44:20'!
 test06NoPuedenHaberMasDeTresCruces
 
 	| tablero |
@@ -89,7 +95,7 @@ test06NoPuedenHaberMasDeTresCruces
 		should: [tablero ponerCruzEn: 2@3]
 		raise: Error
 		withExceptionDo: [ :tableroInvalido |
-			self assert: TerniLapilli ponerSinMasFichas = tableroInvalido messageText ].
+			self assert: TerniLapilli errorPonerSinMasFichas = tableroInvalido messageText ].
 	! !
 
 !TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/2/2018 16:01:11'!
@@ -132,8 +138,28 @@ test08PonerTresFichasEnLineaHorizontalTerminaElJuego
 			self assert: TerniLapilli errorJuegoTerminado = tableroInvalido messageText ].
 	! !
 
-!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/2/2018 16:40:58'!
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 10:02:23'!
 test09PonerTresFichasEnLineaDiagonalTerminaElJuego
+
+	| tablero |
+
+	tablero := TerniLapilli new.
+	
+	tablero ponerCruzEn: 1@1.
+	tablero ponerCirculoEn: 1@2.
+	tablero ponerCruzEn: 2@2.
+	tablero ponerCirculoEn: 2@3.
+	tablero ponerCruzEn: 3@3.
+	
+	self
+		should: [tablero ponerCirculoEn: 1@3]
+		raise: Error
+		withExceptionDo: [ :tableroInvalido |
+			self assert: TerniLapilli errorJuegoTerminado = tableroInvalido messageText ].
+	! !
+
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 10:01:31'!
+test10PonerTresFichasEnLineaDiagonalInversaTerminaElJuego
 
 	| tablero |
 
@@ -152,8 +178,8 @@ test09PonerTresFichasEnLineaDiagonalTerminaElJuego
 			self assert: TerniLapilli errorJuegoTerminado = tableroInvalido messageText ].
 	! !
 
-!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/3/2018 14:55:46'!
-test10NoSePuedePonerFichaFueraDelTablero
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 10:01:08'!
+test11NoSePuedePonerFichaFueraDelTablero
 
 	| tablero |
 
@@ -166,8 +192,8 @@ test10NoSePuedePonerFichaFueraDelTablero
 			self assert: TerniLapilli errorPosicionInvalida = tableroInvalido messageText ].
 	! !
 
-!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/4/2018 17:18:31'!
-test11MoverFichaMueveALaPosicionIndicada
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 10:00:51'!
+test12MoverFichaMueveALaPosicionIndicada
 
 	| tablero |
 
@@ -181,12 +207,13 @@ test11MoverFichaMueveALaPosicionIndicada
 	tablero ponerCirculoEn: 3@1.
 	
 	tablero moverCruzEn: 2@2 a: 3@3.
+	
 	self assert: (tablero fichaCruzEn: 3@3).
 	self assert: (tablero fichaVaciaEn: 2@2)
 	! !
 
-!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/4/2018 16:29:01'!
-test12NoSePuedeMoverFichaSiNoEstanTodas
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 10:00:43'!
+test13NoSePuedeMoverFichaSiNoEstanTodas
 
 	| tablero |
 
@@ -204,8 +231,8 @@ test12NoSePuedeMoverFichaSiNoEstanTodas
 			self assert: TerniLapilli errorFaltanFichas = tableroInvalido messageText]
 	! !
 
-!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/4/2018 16:50:45'!
-test13NoSePuedeMoverFichaAPosicionNoConsecutiva
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 10:00:32'!
+test14NoSePuedeMoverFichaAPosicionNoConsecutiva
 
 	| tablero |
 
@@ -225,8 +252,8 @@ test13NoSePuedeMoverFichaAPosicionNoConsecutiva
 			self assert: TerniLapilli errorMovimientoInvalido = tableroInvalido messageText]
 	! !
 
-!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:29:55'!
-test14MoverTresFichasEnLineaHorizontalTerminaElJuego
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 10:00:26'!
+test15MoverTresFichasEnLineaHorizontalTerminaElJuego
 
 	| tablero |
 
@@ -247,8 +274,8 @@ test14MoverTresFichasEnLineaHorizontalTerminaElJuego
 			self assert: TerniLapilli errorJuegoTerminado = tableroInvalido messageText ].
 	! !
 
-!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:30:07'!
-test15MoverTresFichasEnLineaVerticalTerminaElJuego
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 10:00:18'!
+test16MoverTresFichasEnLineaVerticalTerminaElJuego
 
 	| tablero |
 
@@ -269,8 +296,8 @@ test15MoverTresFichasEnLineaVerticalTerminaElJuego
 			self assert: TerniLapilli errorJuegoTerminado = tableroInvalido messageText ].
 	! !
 
-!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:31:29'!
-test16MoverTresFichasEnLineaDiagonalTerminaElJuego
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 10:00:11'!
+test17MoverTresFichasEnLineaDiagonalTerminaElJuego
 
 	| tablero |
 
@@ -291,8 +318,8 @@ test16MoverTresFichasEnLineaDiagonalTerminaElJuego
 			self assert: TerniLapilli errorJuegoTerminado = tableroInvalido messageText ].
 	! !
 
-!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:32:35'!
-test17MoverTresFichasEnLineaDiagonalInversaTerminaElJuego
+!TerniLapilliTests methodsFor: 'as yet unclassified' stamp: 'ft 11/6/2018 10:00:04'!
+test18MoverTresFichasEnLineaDiagonalInversaTerminaElJuego
 
 	| tablero |
 
@@ -321,62 +348,50 @@ Object subclass: #TerniLapilli
 	poolDictionaries: ''
 	category: 'TerniLapilli'!
 
-!TerniLapilli methodsFor: 'operations' stamp: 'LTO 11/5/2018 19:20:54'!
+!TerniLapilli methodsFor: 'operaciones' stamp: 'ft 11/6/2018 10:06:13'!
 moverCirculoEn: origen a: destino
 
 	turno puedeJugarCirculo.
 	self validarMoverFichaEn: origen a: destino.
-	self state moverCirculoEn: origen a: destino! !
+	
+	self estado moverCirculoEn: origen a: destino! !
 
-!TerniLapilli methodsFor: 'operations' stamp: 'LTO 11/5/2018 19:20:47'!
+!TerniLapilli methodsFor: 'operaciones' stamp: 'ft 11/6/2018 10:06:17'!
 moverCruzEn: origen a: destino
 
 	turno puedeJugarCruz.
 	self validarMoverFichaEn: origen a: destino.
-	self state moverCruzEn: origen a: destino! !
+	
+	self estado moverCruzEn: origen a: destino! !
 
-!TerniLapilli methodsFor: 'operations' stamp: 'LTO 11/5/2018 19:16:56'!
+!TerniLapilli methodsFor: 'operaciones' stamp: 'ft 11/6/2018 10:06:21'!
 ponerCirculoEn: posicion
 
 	turno puedeJugarCirculo.
 	self validarPonerFichaEn: posicion.
-	self state ponerCirculoEn: posicion! !
+	
+	self estado ponerCirculoEn: posicion! !
 
-!TerniLapilli methodsFor: 'operations' stamp: 'LTO 11/5/2018 19:17:15'!
+!TerniLapilli methodsFor: 'operaciones' stamp: 'ft 11/6/2018 10:06:24'!
 ponerCruzEn: posicion
 	
 	turno puedeJugarCruz.
 	self validarPonerFichaEn: posicion.
-	self state ponerCruzEn: posicion! !
+	
+	self estado ponerCruzEn: posicion! !
 
 
-!TerniLapilli methodsFor: 'initialization' stamp: 'LTO 11/5/2018 19:12:32'!
+!TerniLapilli methodsFor: 'inicializacion' stamp: 'ft 11/6/2018 10:07:21'!
 initialize
 	matriz := Array2D height: 3 width: 3.
 	1 to: 3 do: [:x | 
 		1 to: 3 do: [:y | 
 			matriz i: x j: y put: 0]].
 	
-	turno := TurnoCruz new.! !
+	turno := TurnoCruz new! !
 
 
-!TerniLapilli methodsFor: 'accessing' stamp: 'LTO 11/1/2018 19:56:39'!
-fichaCirculoEn: posicion
-	
-	^ (matriz i: posicion x j: posicion y) = 2! !
-
-!TerniLapilli methodsFor: 'accessing' stamp: 'LTO 11/1/2018 19:56:33'!
-fichaCruzEn: posicion
-	
-	^ (matriz i: posicion x j: posicion y) = 1! !
-
-!TerniLapilli methodsFor: 'accessing' stamp: 'LTO 11/1/2018 19:56:26'!
-fichaVaciaEn: posicion
-	
-	^ (matriz i: posicion x j: posicion y) = 0! !
-
-
-!TerniLapilli methodsFor: 'testing' stamp: 'LTO 11/5/2018 17:26:44'!
+!TerniLapilli methodsFor: 'acceso' stamp: 'LTO 11/5/2018 17:26:44'!
 cantidadFichasEnTablero
 	| fichas |
 	
@@ -388,12 +403,94 @@ cantidadFichasEnTablero
 	
 	^fichas! !
 
+!TerniLapilli methodsFor: 'acceso' stamp: 'LTO 11/1/2018 19:56:39'!
+fichaCirculoEn: posicion
+	
+	^ (matriz i: posicion x j: posicion y) = 2! !
+
+!TerniLapilli methodsFor: 'acceso' stamp: 'LTO 11/1/2018 19:56:33'!
+fichaCruzEn: posicion
+	
+	^ (matriz i: posicion x j: posicion y) = 1! !
+
+!TerniLapilli methodsFor: 'acceso' stamp: 'LTO 11/1/2018 19:56:26'!
+fichaVaciaEn: posicion
+	
+	^ (matriz i: posicion x j: posicion y) = 0! !
+
+
 !TerniLapilli methodsFor: 'testing' stamp: 'LTO 11/5/2018 18:10:08'!
 juegoTerminado
 	^ (self validarJuegoTerminado: [:unaPosicionATestear | self fichaCruzEn: unaPosicionATestear]) or: 
 		[self validarJuegoTerminado: [:unaPosicionATestear | self fichaCirculoEn: unaPosicionATestear]]! !
 
-!TerniLapilli methodsFor: 'testing' stamp: 'LTO 11/5/2018 18:08:10'!
+
+!TerniLapilli methodsFor: 'validaciones - privado' stamp: 'ft 11/4/2018 16:55:19'!
+posicionValida: posicion
+
+	^(posicion x between: 1 and: 3) and: [posicion y between: 1 and: 3]! !
+
+!TerniLapilli methodsFor: 'validaciones - privado' stamp: 'ft 11/4/2018 17:10:56'!
+posicionesConsecutivas: posicionIzquierda con: posicionDerecha
+
+	^(posicionDerecha x between: posicionIzquierda x - 1 and: posicionIzquierda x + 1) and: [posicionDerecha y between: posicionIzquierda y - 1 and: posicionIzquierda y + 1]! !
+
+!TerniLapilli methodsFor: 'validaciones - privado' stamp: 'LTO 11/5/2018 19:19:18'!
+validarMoverFichaEn: origen a: destino
+	self validarPonerFichaEn: destino.
+	(self posicionValida: origen) ifFalse: [^self error: self class errorPosicionInvalida].
+	(self posicionesConsecutivas: origen con: destino) ifFalse: [^self error: self class errorMovimientoInvalido]! !
+
+!TerniLapilli methodsFor: 'validaciones - privado' stamp: 'LTO 11/5/2018 19:16:32'!
+validarPonerFichaEn: posicion
+	(self posicionValida: posicion) ifFalse: [^self error: self class errorPosicionInvalida].
+	(self fichaVaciaEn: posicion) ifFalse: [^self error: self class errorPosicionOcupada].! !
+
+
+!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'LTO 11/5/2018 19:14:08'!
+cambiarTurno
+	turno := turno siguienteTurno ! !
+
+!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'LTO 11/5/2018 18:43:05'!
+moverCirculoValidoEn: origen a: destino
+
+	self ponerVaciaEn: origen.
+	self ponerCirculoValidoEn: destino.! !
+
+!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'LTO 11/5/2018 18:44:01'!
+moverCruzValidaEn: origen a: destino
+
+	self ponerVaciaEn: origen.
+	self ponerCruzValidaEn: destino.! !
+
+!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'ft 11/6/2018 10:25:37'!
+moverCuandoTieneQuePoner
+	^self error: self class errorFaltanFichas ! !
+
+!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'LTO 11/5/2018 18:40:06'!
+operacionCuandoJuegoTerminado
+	^self error: self class errorJuegoTerminado! !
+
+!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'LTO 11/5/2018 18:34:49'!
+ponerCirculoValidoEn: posicion
+	matriz i: posicion x j: posicion y put: 2.
+	self cambiarTurno! !
+
+!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'LTO 11/5/2018 18:17:08'!
+ponerCruzValidaEn: posicion
+	matriz i: posicion x j: posicion y put: 1.
+	self cambiarTurno! !
+
+!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'ft 11/6/2018 10:51:57'!
+ponerCuandoTieneQueMover
+	^ self error: self class errorPonerSinMasFichas ! !
+
+!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'ft 11/6/2018 10:26:09'!
+ponerVaciaEn: posicion
+	matriz i: posicion x j: posicion y put: 0.! !
+
+
+!TerniLapilli methodsFor: 'testing - privado' stamp: 'LTO 11/5/2018 18:08:10'!
 validarJuegoTerminado: unBloqueParaValidarPosicion
 
 	| horizontal vertical diagonal diagonalInvertida termino |
@@ -426,76 +523,10 @@ validarJuegoTerminado: unBloqueParaValidarPosicion
 	^ termino! !
 
 
-!TerniLapilli methodsFor: 'validation - private' stamp: 'ft 11/4/2018 16:55:19'!
-posicionValida: posicion
-
-	^(posicion x between: 1 and: 3) and: [posicion y between: 1 and: 3]! !
-
-!TerniLapilli methodsFor: 'validation - private' stamp: 'ft 11/4/2018 17:10:56'!
-posicionesConsecutivas: posicionIzquierda con: posicionDerecha
-
-	^(posicionDerecha x between: posicionIzquierda x - 1 and: posicionIzquierda x + 1) and: [posicionDerecha y between: posicionIzquierda y - 1 and: posicionIzquierda y + 1]! !
-
-!TerniLapilli methodsFor: 'validation - private' stamp: 'LTO 11/5/2018 19:19:18'!
-validarMoverFichaEn: origen a: destino
-	self validarPonerFichaEn: destino.
-	(self posicionValida: origen) ifFalse: [^self error: self class errorPosicionInvalida].
-	(self posicionesConsecutivas: origen con: destino) ifFalse: [^self error: self class errorMovimientoInvalido]! !
-
-!TerniLapilli methodsFor: 'validation - private' stamp: 'LTO 11/5/2018 19:16:32'!
-validarPonerFichaEn: posicion
-	(self posicionValida: posicion) ifFalse: [^self error: self class errorPosicionInvalida].
-	(self fichaVaciaEn: posicion) ifFalse: [^self error: self class errorPosicionOcupada].! !
-
-
-!TerniLapilli methodsFor: 'operations - private' stamp: 'LTO 11/5/2018 19:14:08'!
-cambiarTurno
-	turno := turno siguienteTurno ! !
-
-!TerniLapilli methodsFor: 'operations - private' stamp: 'LTO 11/5/2018 18:43:05'!
-moverCirculoValidoEn: origen a: destino
-
-	self ponerVaciaEn: origen.
-	self ponerCirculoValidoEn: destino.! !
-
-!TerniLapilli methodsFor: 'operations - private' stamp: 'LTO 11/5/2018 18:44:01'!
-moverCruzValidaEn: origen a: destino
-
-	self ponerVaciaEn: origen.
-	self ponerCruzValidaEn: destino.! !
-
-!TerniLapilli methodsFor: 'operations - private' stamp: 'LTO 11/5/2018 18:41:18'!
-moverCuandoTieneQuePoner
-	self error: self class errorFaltanFichas ! !
-
-!TerniLapilli methodsFor: 'operations - private' stamp: 'LTO 11/5/2018 18:40:06'!
-operacionCuandoJuegoTerminado
-	^self error: self class errorJuegoTerminado! !
-
-!TerniLapilli methodsFor: 'operations - private' stamp: 'LTO 11/5/2018 18:34:49'!
-ponerCirculoValidoEn: posicion
-	matriz i: posicion x j: posicion y put: 2.
-	self cambiarTurno! !
-
-!TerniLapilli methodsFor: 'operations - private' stamp: 'LTO 11/5/2018 18:17:08'!
-ponerCruzValidaEn: posicion
-	matriz i: posicion x j: posicion y put: 1.
-	self cambiarTurno! !
-
-!TerniLapilli methodsFor: 'operations - private' stamp: 'LTO 11/5/2018 18:33:04'!
-ponerSinMasFichas
-	^ self error: self class ponerSinMasFichas ! !
-
-!TerniLapilli methodsFor: 'operations - private' stamp: 'ft 11/4/2018 16:12:55'!
-ponerVaciaEn: posicion
-
-	matriz i: posicion x j: posicion y put: 0.! !
-
-
-!TerniLapilli methodsFor: 'state' stamp: 'LTO 11/5/2018 18:18:13'!
-state
+!TerniLapilli methodsFor: 'estado' stamp: 'ft 11/6/2018 10:34:06'!
+estado
 	
-	^TerniLapilliEstado for: self! !
+	^TerniLapilliEstado para: self! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -523,6 +554,11 @@ errorMovimientoInvalido
 
 	^'No se puede mover la ficha a la posicion indicada'! !
 
+!TerniLapilli class methodsFor: 'error messages' stamp: 'ft 11/6/2018 10:44:20'!
+errorPonerSinMasFichas
+
+	^ 'No se pueden poner más fichas en el tablero'! !
+
 !TerniLapilli class methodsFor: 'error messages' stamp: 'ft 11/3/2018 15:02:39'!
 errorPosicionInvalida
 
@@ -533,11 +569,6 @@ errorPosicionOcupada
 
 	^ 'La posicion en la que queres jugar esta ocupada'! !
 
-!TerniLapilli class methodsFor: 'error messages' stamp: 'LTO 11/5/2018 18:33:04'!
-ponerSinMasFichas
-
-	^ 'No se pueden poner más fichas en el tablero'! !
-
 
 !classDefinition: #TerniLapilliEstado category: #TerniLapilli!
 Object subclass: #TerniLapilliEstado
@@ -546,24 +577,31 @@ Object subclass: #TerniLapilliEstado
 	poolDictionaries: ''
 	category: 'TerniLapilli'!
 
-!TerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 17:47:32'!
-initializeFor: unTerniLapilli 
-	
-	terniLapilli := unTerniLapilli ! !
-
-!TerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:37:17'!
+!TerniLapilliEstado methodsFor: 'operaciones' stamp: 'ft 11/6/2018 10:32:02'!
 moverCirculoEn: origen a: destino
+
 	self subclassResponsibility ! !
 
-!TerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:31:04'!
+!TerniLapilliEstado methodsFor: 'operaciones' stamp: 'ft 11/6/2018 10:33:38'!
+moverCruzEn: origen a: destino
+
+	self subclassResponsibility ! !
+
+!TerniLapilliEstado methodsFor: 'operaciones' stamp: 'LTO 11/5/2018 18:31:04'!
 ponerCirculoEn: posicion
 
 	self subclassResponsibility ! !
 
-!TerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:19:32'!
+!TerniLapilliEstado methodsFor: 'operaciones' stamp: 'LTO 11/5/2018 18:19:32'!
 ponerCruzEn: posicion
 
 	self subclassResponsibility ! !
+
+
+!TerniLapilliEstado methodsFor: 'inicializacion' stamp: 'LTO 11/5/2018 17:47:32'!
+initializeFor: unTerniLapilli 
+	
+	terniLapilli := unTerniLapilli ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -571,23 +609,25 @@ ponerCruzEn: posicion
 TerniLapilliEstado class
 	instanceVariableNames: ''!
 
-!TerniLapilliEstado class methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 17:45:32'!
-for: unTerniLapilli 
-	
-	^ self subclasses 
-		detect: [:aStateClass | aStateClass isFor: unTerniLapilli ]
-		ifFound: [:aStateClass | aStateClass newFor: unTerniLapilli ]
-		ifNone: [ self error: 'Estado invalido para TerniLapilli' ]! !
-
-!TerniLapilliEstado class methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 17:46:14'!
-isFor: unTerniLapilli
-
-	self subclassResponsibility ! !
-
-!TerniLapilliEstado class methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 17:46:30'!
+!TerniLapilliEstado class methodsFor: 'creacion de instancia' stamp: 'LTO 11/5/2018 17:46:30'!
 newFor: unTerniLapilli 
 	
 	^self new initializeFor: unTerniLapilli ! !
+
+
+!TerniLapilliEstado class methodsFor: 'busqueda' stamp: 'ft 11/6/2018 10:35:16'!
+para: unTerniLapilli 
+	
+	^ self subclasses 
+		detect: [:unaClaseDeEstado | unaClaseDeEstado esPara: unTerniLapilli ]
+		ifFound: [:unaClaseDeEstado | unaClaseDeEstado newFor: unTerniLapilli ]
+		ifNone: [ self error: 'Estado invalido para TerniLapilli' ]! !
+
+
+!TerniLapilliEstado class methodsFor: 'testing' stamp: 'ft 11/6/2018 10:34:30'!
+esPara: unTerniLapilli
+
+	self subclassResponsibility ! !
 
 
 !classDefinition: #MoviendoFichasTerniLapilliEstado category: #TerniLapilli!
@@ -597,21 +637,21 @@ TerniLapilliEstado subclass: #MoviendoFichasTerniLapilliEstado
 	poolDictionaries: ''
 	category: 'TerniLapilli'!
 
-!MoviendoFichasTerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:38:07'!
+!MoviendoFichasTerniLapilliEstado methodsFor: 'operaciones' stamp: 'LTO 11/5/2018 18:38:07'!
 moverCirculoEn: origen a: destino
 	^ terniLapilli moverCirculoValidoEn: origen a: destino.! !
 
-!MoviendoFichasTerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:44:38'!
+!MoviendoFichasTerniLapilliEstado methodsFor: 'operaciones' stamp: 'LTO 11/5/2018 18:44:38'!
 moverCruzEn: origen a: destino
 	^ terniLapilli moverCruzValidaEn: origen a: destino.! !
 
-!MoviendoFichasTerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:31:24'!
+!MoviendoFichasTerniLapilliEstado methodsFor: 'operaciones' stamp: 'ft 11/6/2018 10:51:30'!
 ponerCirculoEn: posicion
-	^ terniLapilli ponerSinMasFichas! !
+	^ terniLapilli ponerCuandoTieneQueMover! !
 
-!MoviendoFichasTerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:33:04'!
+!MoviendoFichasTerniLapilliEstado methodsFor: 'operaciones' stamp: 'ft 11/6/2018 10:51:37'!
 ponerCruzEn: posicion
-	^ terniLapilli ponerSinMasFichas! !
+	^ terniLapilli ponerCuandoTieneQueMover! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -619,8 +659,8 @@ ponerCruzEn: posicion
 MoviendoFichasTerniLapilliEstado class
 	instanceVariableNames: ''!
 
-!MoviendoFichasTerniLapilliEstado class methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:12:00'!
-isFor: unTerniLapilli
+!MoviendoFichasTerniLapilliEstado class methodsFor: 'testing' stamp: 'ft 11/6/2018 10:34:30'!
+esPara: unTerniLapilli
 	
 	^ unTerniLapilli cantidadFichasEnTablero = 6 and: [unTerniLapilli juegoTerminado not]! !
 
@@ -632,19 +672,19 @@ TerniLapilliEstado subclass: #PoniendoFichasTerniLapilliEstado
 	poolDictionaries: ''
 	category: 'TerniLapilli'!
 
-!PoniendoFichasTerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:38:48'!
+!PoniendoFichasTerniLapilliEstado methodsFor: 'operaciones' stamp: 'LTO 11/5/2018 18:38:48'!
 moverCirculoEn: origen a: destino
 	^ terniLapilli moverCuandoTieneQuePoner.! !
 
-!PoniendoFichasTerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:38:55'!
+!PoniendoFichasTerniLapilliEstado methodsFor: 'operaciones' stamp: 'LTO 11/5/2018 18:38:55'!
 moverCruzEn: origen a: destino
 	^ terniLapilli moverCuandoTieneQuePoner.! !
 
-!PoniendoFichasTerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:31:48'!
+!PoniendoFichasTerniLapilliEstado methodsFor: 'operaciones' stamp: 'LTO 11/5/2018 18:31:48'!
 ponerCirculoEn: posicion
 	^ terniLapilli ponerCirculoValidoEn: posicion! !
 
-!PoniendoFichasTerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:24:56'!
+!PoniendoFichasTerniLapilliEstado methodsFor: 'operaciones' stamp: 'LTO 11/5/2018 18:24:56'!
 ponerCruzEn: posicion
 	^ terniLapilli ponerCruzValidaEn: posicion! !
 
@@ -654,8 +694,8 @@ ponerCruzEn: posicion
 PoniendoFichasTerniLapilliEstado class
 	instanceVariableNames: ''!
 
-!PoniendoFichasTerniLapilliEstado class methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:12:10'!
-isFor: unTerniLapilli
+!PoniendoFichasTerniLapilliEstado class methodsFor: 'testing' stamp: 'ft 11/6/2018 10:34:30'!
+esPara: unTerniLapilli
 	
 	^ unTerniLapilli cantidadFichasEnTablero < 6 and: [unTerniLapilli juegoTerminado not]! !
 
@@ -667,19 +707,19 @@ TerniLapilliEstado subclass: #TerminadoTerniLapilliEstado
 	poolDictionaries: ''
 	category: 'TerniLapilli'!
 
-!TerminadoTerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:39:27'!
+!TerminadoTerniLapilliEstado methodsFor: 'operaciones' stamp: 'ft 11/6/2018 10:32:41'!
 moverCirculoEn: origen a: destino
-	^ terniLapilli operacionCuandoJuegoTerminado.! !
+	^ terniLapilli operacionCuandoJuegoTerminado! !
 
-!TerminadoTerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:39:30'!
+!TerminadoTerniLapilliEstado methodsFor: 'operaciones' stamp: 'ft 11/6/2018 10:32:44'!
 moverCruzEn: origen a: destino
-	^ terniLapilli operacionCuandoJuegoTerminado.! !
+	^ terniLapilli operacionCuandoJuegoTerminado! !
 
-!TerminadoTerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:40:06'!
+!TerminadoTerniLapilliEstado methodsFor: 'operaciones' stamp: 'LTO 11/5/2018 18:40:06'!
 ponerCirculoEn: posicion
 	^ terniLapilli operacionCuandoJuegoTerminado! !
 
-!TerminadoTerniLapilliEstado methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:40:06'!
+!TerminadoTerniLapilliEstado methodsFor: 'operaciones' stamp: 'LTO 11/5/2018 18:40:06'!
 ponerCruzEn: posicion
 	^ terniLapilli operacionCuandoJuegoTerminado! !
 
@@ -689,8 +729,8 @@ ponerCruzEn: posicion
 TerminadoTerniLapilliEstado class
 	instanceVariableNames: ''!
 
-!TerminadoTerniLapilliEstado class methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 18:12:28'!
-isFor: unTerniLapilli
+!TerminadoTerniLapilliEstado class methodsFor: 'testing' stamp: 'ft 11/6/2018 10:34:30'!
+esPara: unTerniLapilli
 	
 	^ unTerniLapilli juegoTerminado! !
 
@@ -702,15 +742,16 @@ Object subclass: #Turno
 	poolDictionaries: ''
 	category: 'TerniLapilli'!
 
-!Turno methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:09:24'!
+!Turno methodsFor: 'testing' stamp: 'LTO 11/5/2018 19:09:24'!
 puedeJugarCirculo
 	self subclassResponsibility ! !
 
-!Turno methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:09:21'!
+!Turno methodsFor: 'testing' stamp: 'LTO 11/5/2018 19:09:21'!
 puedeJugarCruz
 	self subclassResponsibility ! !
 
-!Turno methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:06:04'!
+
+!Turno methodsFor: 'operaciones' stamp: 'LTO 11/5/2018 19:06:04'!
 siguienteTurno
 	self subclassResponsibility ! !
 
@@ -722,14 +763,15 @@ Turno subclass: #TurnoCirculo
 	poolDictionaries: ''
 	category: 'TerniLapilli'!
 
-!TurnoCirculo methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:09:48'!
+!TurnoCirculo methodsFor: 'testing' stamp: 'LTO 11/5/2018 19:09:48'!
 puedeJugarCirculo! !
 
-!TurnoCirculo methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:10:49'!
+!TurnoCirculo methodsFor: 'testing' stamp: 'ft 11/6/2018 10:37:06'!
 puedeJugarCruz
-	self error: TerniLapilli errorJugadaSinTurno ! !
+	^self error: TerniLapilli errorJugadaSinTurno ! !
 
-!TurnoCirculo methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:12:01'!
+
+!TurnoCirculo methodsFor: 'operaciones' stamp: 'LTO 11/5/2018 19:12:01'!
 siguienteTurno
 	^ TurnoCruz new! !
 
@@ -741,14 +783,15 @@ Turno subclass: #TurnoCruz
 	poolDictionaries: ''
 	category: 'TerniLapilli'!
 
-!TurnoCruz methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:11:33'!
+!TurnoCruz methodsFor: 'testing' stamp: 'ft 11/6/2018 10:38:44'!
 puedeJugarCirculo
-	self error: TerniLapilli errorJugadaSinTurno ! !
+	^self error: TerniLapilli errorJugadaSinTurno ! !
 
-!TurnoCruz methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:11:39'!
+!TurnoCruz methodsFor: 'testing' stamp: 'LTO 11/5/2018 19:11:39'!
 puedeJugarCruz
 ! !
 
-!TurnoCruz methodsFor: 'as yet unclassified' stamp: 'LTO 11/5/2018 19:12:05'!
+
+!TurnoCruz methodsFor: 'operaciones' stamp: 'LTO 11/5/2018 19:12:05'!
 siguienteTurno
 	^ TurnoCirculo new! !
