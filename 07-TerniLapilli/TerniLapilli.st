@@ -343,7 +343,7 @@ test18MoverTresFichasEnLineaDiagonalInversaTerminaElJuego
 
 !classDefinition: #TerniLapilli category: #TerniLapilli!
 Object subclass: #TerniLapilli
-	instanceVariableNames: 'matriz turno'
+	instanceVariableNames: 'tablero turno'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TerniLapilli'!
@@ -381,12 +381,12 @@ ponerCruzEn: posicion
 	self estado ponerCruzEn: posicion! !
 
 
-!TerniLapilli methodsFor: 'inicializacion' stamp: 'ft 11/6/2018 10:07:21'!
+!TerniLapilli methodsFor: 'inicializacion' stamp: 'LTO 11/8/2018 16:39:24'!
 initialize
-	matriz := Array2D height: 3 width: 3.
+	tablero := Array2D height: 3 width: 3.
 	1 to: 3 do: [:x | 
 		1 to: 3 do: [:y | 
-			matriz i: x j: y put: 0]].
+			tablero i: x j: y put: 0]].
 	
 	turno := TurnoCruz new! !
 
@@ -403,20 +403,20 @@ cantidadFichasEnTablero
 	
 	^fichas! !
 
-!TerniLapilli methodsFor: 'acceso' stamp: 'LTO 11/1/2018 19:56:39'!
+!TerniLapilli methodsFor: 'acceso' stamp: 'LTO 11/8/2018 16:38:59'!
 fichaCirculoEn: posicion
 	
-	^ (matriz i: posicion x j: posicion y) = 2! !
+	^ (tablero i: posicion x j: posicion y) = 2! !
 
-!TerniLapilli methodsFor: 'acceso' stamp: 'LTO 11/1/2018 19:56:33'!
+!TerniLapilli methodsFor: 'acceso' stamp: 'LTO 11/8/2018 16:39:07'!
 fichaCruzEn: posicion
 	
-	^ (matriz i: posicion x j: posicion y) = 1! !
+	^ (tablero i: posicion x j: posicion y) = 1! !
 
-!TerniLapilli methodsFor: 'acceso' stamp: 'LTO 11/1/2018 19:56:26'!
+!TerniLapilli methodsFor: 'acceso' stamp: 'LTO 11/8/2018 16:39:13'!
 fichaVaciaEn: posicion
 	
-	^ (matriz i: posicion x j: posicion y) = 0! !
+	^ (tablero i: posicion x j: posicion y) = 0! !
 
 
 !TerniLapilli methodsFor: 'testing' stamp: 'LTO 11/5/2018 18:10:08'!
@@ -471,23 +471,23 @@ moverCuandoTieneQuePoner
 operacionCuandoJuegoTerminado
 	^self error: self class errorJuegoTerminado! !
 
-!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'LTO 11/5/2018 18:34:49'!
+!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'LTO 11/8/2018 16:39:37'!
 ponerCirculoValidoEn: posicion
-	matriz i: posicion x j: posicion y put: 2.
+	tablero i: posicion x j: posicion y put: 2.
 	self cambiarTurno! !
 
-!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'LTO 11/5/2018 18:17:08'!
+!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'LTO 11/8/2018 16:39:51'!
 ponerCruzValidaEn: posicion
-	matriz i: posicion x j: posicion y put: 1.
+	tablero i: posicion x j: posicion y put: 1.
 	self cambiarTurno! !
 
 !TerniLapilli methodsFor: 'operaciones - privado' stamp: 'ft 11/6/2018 10:51:57'!
 ponerCuandoTieneQueMover
 	^ self error: self class errorPonerSinMasFichas ! !
 
-!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'ft 11/6/2018 10:26:09'!
+!TerniLapilli methodsFor: 'operaciones - privado' stamp: 'LTO 11/8/2018 16:40:00'!
 ponerVaciaEn: posicion
-	matriz i: posicion x j: posicion y put: 0.! !
+	tablero i: posicion x j: posicion y put: 0.! !
 
 
 !TerniLapilli methodsFor: 'testing - privado' stamp: 'LTO 11/5/2018 18:08:10'!
