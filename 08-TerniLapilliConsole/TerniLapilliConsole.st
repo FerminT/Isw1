@@ -14,8 +14,8 @@ test01CreateEmptyGameAndConsole
 	self assert: console lines isEmpty
 	! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'LTO 11/8/2018 19:53:00'!
-test02ConsoleLogsFirstPlay
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/8/2018 20:48:55'!
+test02FirstPlayIsLogged
 	game _ TerniLapilli new.
 	console _ TerniLapilliConsole on: game.
 	
@@ -24,14 +24,14 @@ test02ConsoleLogsFirstPlay
 	lines _ console lines.
 	
 	self assert: lines size equals: 2.
-	self assert: (lines at: 1 ) equals: 'X marcó en 2@2'.
-	self assert: (lines at: 2 ) equals: 'Estado: Jugando O'
+	self assertXMarkedMessageOn: 2@2 atLine: 1.
+	self assertPlayingOStateMessageAt: 2.
 	
 	
 ! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'LTO 11/8/2018 19:53:19'!
-test03ConsoleLogsSecondPlay
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/8/2018 20:50:07'!
+test03SecondPlayIsLogged
 	game _ TerniLapilli new.
 	console _ TerniLapilliConsole on: game.
 	
@@ -41,13 +41,13 @@ test03ConsoleLogsSecondPlay
 	lines _ console lines.
 	
 	self assert: lines size equals: 4.
-	self assert: (lines at: 1) equals: 'X marcó en 2@2'.
-	self assert: (lines at: 2) equals: 'Estado: Jugando O'.
-	self assert: (lines at: 3) equals: 'O marcó en 1@1'.
-	self assert: (lines at: 4) equals: 'Estado: Jugando X'.! !
+	self assertXMarkedMessageOn: 2@2 atLine: 1.
+	self assertPlayingOStateMessageAt: 2.
+	self assertOMarkedMessageOn: 1@1 atLine: 3.
+	self assertPlayingXStateMessageAt: 4.! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'LTO 11/8/2018 20:14:17'!
-test04EndGameIn5Plays
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/8/2018 20:51:57'!
+test04aXWonStateIsLogged
 	game _ TerniLapilli new.
 	console _ TerniLapilliConsole on: game.
 	
@@ -60,19 +60,19 @@ test04EndGameIn5Plays
 	lines _ console lines.
 	
 	self assert: lines size equals: 10.
-	self assert: (lines at: 1) equals: 'X marcó en 2@2'.
-	self assert: (lines at: 2) equals: 'Estado: Jugando O'.
-	self assert: (lines at: 3) equals: 'O marcó en 1@1'.
-	self assert: (lines at: 4) equals: 'Estado: Jugando X'.
-	self assert: (lines at: 5) equals: 'X marcó en 1@3'.
-	self assert: (lines at: 6) equals: 'Estado: Jugando O'.
-	self assert: (lines at: 7) equals: 'O marcó en 1@2'.
-	self assert: (lines at: 8) equals: 'Estado: Jugando X'.
-	self assert: (lines at: 9) equals: 'X marcó en 3@1'.
-	self assert: (lines at: 10) equals: 'Estado: Juego terminado - ¡Ganó X!!'.! !
+	self assertXMarkedMessageOn: 2@2 atLine: 1.
+	self assertPlayingOStateMessageAt: 2.
+	self assertOMarkedMessageOn: 1@1 atLine: 3.
+	self assertPlayingXStateMessageAt: 4.
+	self assertXMarkedMessageOn: 1@3 atLine: 5.
+	self assertPlayingOStateMessageAt: 6.
+	self assertOMarkedMessageOn: 1@2 atLine: 7.
+	self assertPlayingXStateMessageAt: 8.
+	self assertXMarkedMessageOn: 3@1 atLine: 9.
+	self assertXWonStateMessageAt: 10! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'LTO 11/8/2018 20:16:29'!
-test04bEndGameIn5Plays
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/8/2018 20:55:04'!
+test04bOWonStateIsLogged
 	game _ TerniLapilli new.
 	console _ TerniLapilliConsole on: game.
 	
@@ -86,52 +86,124 @@ test04bEndGameIn5Plays
 	lines _ console lines.
 	
 	self assert: lines size equals: 12.
-	self assert: (lines at: 1) equals: 'X marcó en 1@1'.
-	self assert: (lines at: 2) equals: 'Estado: Jugando O'.
-	self assert: (lines at: 3) equals: 'O marcó en 2@2'.
-	self assert: (lines at: 4) equals: 'Estado: Jugando X'.
-	self assert: (lines at: 5) equals: 'X marcó en 1@2'.
-	self assert: (lines at: 6) equals: 'Estado: Jugando O'.
-	self assert: (lines at: 7) equals: 'O marcó en 1@3'.
-	self assert: (lines at: 8) equals: 'Estado: Jugando X'.
-	self assert: (lines at: 9) equals: 'X marcó en 3@3'.
-	self assert: (lines at: 10) equals: 'Estado: Jugando O'.
-	self assert: (lines at: 11) equals: 'O marcó en 3@1'.
-	self assert: (lines at: 12) equals: 'Estado: Juego terminado - ¡Ganó O!!'.! !
+	self assertXMarkedMessageOn: 1@1 atLine: 1.
+	self assertPlayingOStateMessageAt: 2.
+	self assertOMarkedMessageOn: 2@2 atLine: 3.
+	self assertPlayingXStateMessageAt: 4.
+	self assertXMarkedMessageOn: 1@2 atLine: 5.
+	self assertPlayingOStateMessageAt: 6.
+	self assertOMarkedMessageOn: 1@3 atLine: 7.
+	self assertPlayingXStateMessageAt: 8.
+	self assertXMarkedMessageOn: 3@3 atLine: 9.
+	self assertPlayingOStateMessageAt: 10.
+	self assertOMarkedMessageOn: 3@1 atLine: 11.
+	self assertOWonStateMessageAt: 12! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'LTO 11/8/2018 20:20:49'!
-test05ConsoleRegisterMovement
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/8/2018 21:01:44'!
+test05SlidingXIsLogged
 	game _ TerniLapilli new.
 	console _ TerniLapilliConsole on: game.
 	
 	game putXAt: 2@2.
 	game putOAt: 1@1.
 	game putXAt: 1@3.
-	game putOAt: 3@2.
+	game putOAt: 3@1.
 	game putXAt: 2@1.
 	game putOAt: 2@3.
-	game slideXFrom: 1@2 to: 1@3.
-	game slideOFrom: 3@2 to: 3@1.
+	game slideXFrom: 1@3 to: 1@2.
+	
+	lines _ console lines.
+	
+	self assert: lines size equals: 14.
+	self assertXMarkedMessageOn: 2@2 atLine: 1.
+	self assertPlayingOStateMessageAt: 2.
+	self assertOMarkedMessageOn: 1@1 atLine: 3.
+	self assertPlayingXStateMessageAt: 4.
+	self assertXMarkedMessageOn: 1@3 atLine: 5.
+	self assertPlayingOStateMessageAt: 6.
+	self assertOMarkedMessageOn: 3@1 atLine: 7.
+	self assertPlayingXStateMessageAt: 8.
+	self assertXMarkedMessageOn: 2@1 atLine: 9.
+	self assertPlayingOStateMessageAt: 10.
+	self assertOMarkedMessageOn: 2@3 atLine: 11.
+	self assertPlayingXStateMessageAt: 12.
+	self assertXSlidMessageOn: 1@3 to: 1@2 atLine: 13.
+	self assertPlayingOStateMessageAt: 14.! !
+
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/8/2018 21:04:02'!
+test06SlidingOIsLogged
+	game _ TerniLapilli new.
+	console _ TerniLapilliConsole on: game.
+	
+	game putXAt: 2@2.
+	game putOAt: 1@1.
+	game putXAt: 1@3.
+	game putOAt: 3@1.
+	game putXAt: 2@1.
+	game putOAt: 2@3.
+	game slideXFrom: 1@3 to: 1@2.
+	game slideOFrom: 3@1 to: 3@2.
 	
 	lines _ console lines.
 	
 	self assert: lines size equals: 16.
-	self assert: (lines at: 1) equals: 'X marcó en 2@2'.
-	self assert: (lines at: 2) equals: 'Estado: Jugando O'.
-	self assert: (lines at: 3) equals: 'O marcó en 1@1'.
-	self assert: (lines at: 4) equals: 'Estado: Jugando X'.
-	self assert: (lines at: 5) equals: 'X marcó en 1@3'.
-	self assert: (lines at: 6) equals: 'Estado: Jugando O'.
-	self assert: (lines at: 7) equals: 'O marcó en 3@1'.
-	self assert: (lines at: 8) equals: 'Estado: Jugando X'.
-	self assert: (lines at: 9) equals: 'X marcó en 2@1'.
-	self assert: (lines at: 10) equals: 'Estado: Jugando O'.
-	self assert: (lines at: 11) equals: 'O marcó en 2@3'.
-	self assert: (lines at: 12) equals: 'Estado: Jugando X'.
-	self assert: (lines at: 13) equals: 'X deslizó hasta 1@2 desde 1@3'.
-	self assert: (lines at: 14) equals: 'Estado: Jugando O'.
-	self assert: (lines at: 15) equals: 'O deslizó hasta 3@2 desde 3@1'.
-	self assert: (lines at: 16) equals: 'Estado: Jugando X'.! !
+	self assertXMarkedMessageOn: 2@2 atLine: 1.
+	self assertPlayingOStateMessageAt: 2.
+	self assertOMarkedMessageOn: 1@1 atLine: 3.
+	self assertPlayingXStateMessageAt: 4.
+	self assertXMarkedMessageOn: 1@3 atLine: 5.
+	self assertPlayingOStateMessageAt: 6.
+	self assertOMarkedMessageOn: 3@1 atLine: 7.
+	self assertPlayingXStateMessageAt: 8.
+	self assertXMarkedMessageOn: 2@1 atLine: 9.
+	self assertPlayingOStateMessageAt: 10.
+	self assertOMarkedMessageOn: 2@3 atLine: 11.
+	self assertPlayingXStateMessageAt: 12.
+	self assertXSlidMessageOn: 1@3 to: 1@2 atLine: 13.
+	self assertPlayingOStateMessageAt: 14.
+	self assertOSlidMessageOn: 3@1 to: 3@2 atLine: 15.
+	self assertPlayingXStateMessageAt: 16.! !
+
+
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 20:48:18'!
+assertOMarkedMessageOn: aPosition atLine: index
+
+	self assert: (lines at: index) equals: 'O marcó en ', aPosition asString! !
+
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 21:00:57'!
+assertOSlidMessageOn: aPosition to: anotherPosition atLine: index
+
+	self assert: (lines at: index) equals: 'O deslizó hasta ', anotherPosition asString, ' desde ', aPosition asString! !
+
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 20:52:56'!
+assertOWonStateMessageAt: index
+
+	self assert: (lines at: index) equals: 'Estado: Juego terminado - ¡Ganó O!!'! !
+
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 20:49:05'!
+assertPlayingOStateMessageAt: index
+
+	self assert: (lines at: index) equals: 'Estado: Jugando O'! !
+
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 20:49:12'!
+assertPlayingXStateMessageAt: index
+
+	self assert: (lines at: index) equals: 'Estado: Jugando X'! !
+
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 20:45:39'!
+assertXMarkedMessageOn: aPosition atLine: index
+
+	self assert: (lines at: index) equals: 'X marcó en ', aPosition asString! !
+
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 21:00:07'!
+assertXSlidMessageOn: aPosition to: anotherPosition atLine: index
+
+	self assert: (lines at: index) equals: 'X deslizó hasta ', anotherPosition asString, ' desde ', aPosition asString! !
+
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 20:53:04'!
+assertXWonStateMessageAt: index
+
+	self assert: (lines at: index) equals: 'Estado: Juego terminado - ¡Ganó X!!'! !
 
 
 !classDefinition: #TerniLapilliTest category: #TerniLapilli!
@@ -1220,15 +1292,16 @@ slideOWhenPlayingXFrom: aPosition to: anotherPosition
 
 	self error: self class notOTurnErrorMessage ! !
 
-!TerniLapilli methodsFor: 'sliding - private' stamp: 'HAW 11/8/2018 11:53:04'!
+!TerniLapilli methodsFor: 'sliding - private' stamp: 'ft 11/8/2018 20:39:30'!
 slideOWhenSlidingOFrom: aPosition to: anotherPosition
 	
 	self assertIsFree: anotherPosition .
 	self assertIsLegalMovementFrom: aPosition to: anotherPosition.
 	
 	playerOPositions remove: aPosition.
-	self changeStateAfterAdding: anotherPosition to: playerOPositions
-	 ! !
+	self changeStateAfterAdding: anotherPosition to: playerOPositions.
+	 
+	console reportSlideOFrom: aPosition to: anotherPosition! !
 
 !TerniLapilli methodsFor: 'sliding - private' stamp: 'HAW 11/8/2018 11:16:01'!
 slideXWhenPlacingXFrom: aPosition to: anotherPosition
@@ -1240,14 +1313,16 @@ slideXWhenPlayingOFrom: aPosition to: anotherPosition
 
 	self error: self class notXTurnErrorMessage! !
 
-!TerniLapilli methodsFor: 'sliding - private' stamp: 'HAW 11/8/2018 11:53:04'!
+!TerniLapilli methodsFor: 'sliding - private' stamp: 'ft 11/8/2018 20:39:23'!
 slideXWhenSlidingXFrom: aPosition to: anotherPosition
 	
 	self assertIsFree: anotherPosition .
 	self assertIsLegalMovementFrom: aPosition to: anotherPosition.
 	
 	playerXPositions remove: aPosition.
-	self changeStateAfterAdding: anotherPosition to: playerXPositions! !
+	self changeStateAfterAdding: anotherPosition to: playerXPositions.
+	
+	console reportSlideXFrom: aPosition to: anotherPosition! !
 
 
 !TerniLapilli methodsFor: 'testing board positions' stamp: 'HAW 11/8/2018 12:19:28'!
