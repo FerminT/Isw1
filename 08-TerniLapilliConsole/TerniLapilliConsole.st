@@ -1507,15 +1507,14 @@ positionTakenErrorMessage
 
 !classDefinition: #TerniLapilliConsole category: #TerniLapilliConsole!
 Object subclass: #TerniLapilliConsole
-	instanceVariableNames: 'game lines'
+	instanceVariableNames: 'lines'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TerniLapilliConsole'!
 
-!TerniLapilliConsole methodsFor: 'initialization' stamp: 'ft 11/9/2018 14:13:20'!
+!TerniLapilliConsole methodsFor: 'initialization' stamp: 'ft 11/10/2018 22:17:00'!
 initializeOn: aGame
-	game := aGame.
-	game addStateObserver: self.
+	aGame addStateObserver: self.
 	lines := OrderedCollection new! !
 
 
@@ -1637,10 +1636,10 @@ accept: aTerniLapilliStateVisitor
 	self subclassResponsibility ! !
 
 
-!TerniLapilliState methodsFor: 'last play' stamp: 'ft 11/9/2018 15:21:30'!
+!TerniLapilliState methodsFor: 'last play' stamp: 'ft 11/10/2018 22:17:36'!
 lastPlay
 
-	^game lastPlay! !
+	^ game lastPlay! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
