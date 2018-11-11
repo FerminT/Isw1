@@ -5,19 +5,19 @@ TestCase subclass: #TerniLapilliConsoleTest
 	poolDictionaries: ''
 	category: 'TerniLapilliConsole'!
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'LTO 11/8/2018 19:33:26'!
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 14:36:10'!
 test01CreateEmptyGameAndConsole
 
 	game _ TerniLapilli new.
-	console _ TerniLapilliConsole on: game.
+	console _ Console on: game.
 	
 	self assert: console lines isEmpty
 	! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/8/2018 20:48:55'!
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 14:36:09'!
 test02FirstPlayIsLogged
 	game _ TerniLapilli new.
-	console _ TerniLapilliConsole on: game.
+	console _ Console on: game.
 	
 	game putXAt: 2@2.
 	
@@ -30,10 +30,10 @@ test02FirstPlayIsLogged
 	
 ! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/8/2018 20:50:07'!
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 14:36:10'!
 test03SecondPlayIsLogged
 	game _ TerniLapilli new.
-	console _ TerniLapilliConsole on: game.
+	console _ Console on: game.
 	
 	game putXAt: 2@2.
 	game putOAt: 1@1.
@@ -46,10 +46,10 @@ test03SecondPlayIsLogged
 	self assertOMarkedMessageOn: 1@1 atLine: 3.
 	self assertPlayingXStateMessageAt: 4.! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/8/2018 20:51:57'!
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 14:36:09'!
 test04aXWonStateIsLogged
 	game _ TerniLapilli new.
-	console _ TerniLapilliConsole on: game.
+	console _ Console on: game.
 	
 	game putXAt: 2@2.
 	game putOAt: 1@1.
@@ -71,10 +71,10 @@ test04aXWonStateIsLogged
 	self assertXMarkedMessageOn: 3@1 atLine: 9.
 	self assertXWonStateMessageAt: 10! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/8/2018 20:55:04'!
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 14:36:10'!
 test04bOWonStateIsLogged
 	game _ TerniLapilli new.
-	console _ TerniLapilliConsole on: game.
+	console _ Console on: game.
 	
 	game putXAt: 1@1.
 	game putOAt: 2@2.
@@ -99,10 +99,10 @@ test04bOWonStateIsLogged
 	self assertOMarkedMessageOn: 3@1 atLine: 11.
 	self assertOWonStateMessageAt: 12! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/8/2018 21:01:44'!
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 14:36:10'!
 test05SlidingXIsLogged
 	game _ TerniLapilli new.
-	console _ TerniLapilliConsole on: game.
+	console _ Console on: game.
 	
 	game putXAt: 2@2.
 	game putOAt: 1@1.
@@ -130,10 +130,10 @@ test05SlidingXIsLogged
 	self assertXSlidMessageOn: 1@3 to: 1@2 atLine: 13.
 	self assertPlayingOStateMessageAt: 14.! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/8/2018 21:04:02'!
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 14:36:10'!
 test06SlidingOIsLogged
 	game _ TerniLapilli new.
-	console _ TerniLapilliConsole on: game.
+	console _ Console on: game.
 	
 	game putXAt: 2@2.
 	game putOAt: 1@1.
@@ -1505,64 +1505,6 @@ positionTakenErrorMessage
 	^'Position taken'! !
 
 
-!classDefinition: #TerniLapilliConsole category: #TerniLapilliConsole!
-Object subclass: #TerniLapilliConsole
-	instanceVariableNames: 'lines'
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'TerniLapilliConsole'!
-
-!TerniLapilliConsole methodsFor: 'initialization' stamp: 'ft 11/10/2018 22:17:00'!
-initializeOn: aGame
-	aGame addStateObserver: self.
-	lines := OrderedCollection new! !
-
-
-!TerniLapilliConsole methodsFor: 'log' stamp: 'ft 11/10/2018 22:14:05'!
-update: newTerniLapilliState
-
-	"Pensar cómo implementar #lastPlay. Ahora devuelve un String."
-	
-	lines add: newTerniLapilliState lastPlay.
-	newTerniLapilliState accept: self! !
-
-
-!TerniLapilliConsole methodsFor: 'lines' stamp: 'ft 11/9/2018 10:26:56'!
-lines
-	^ lines! !
-
-
-!TerniLapilliConsole methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:12:50'!
-visitPlayingO: aPlayingOState
-
-	^lines add: 'Estado: Jugando O'! !
-
-!TerniLapilliConsole methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:12:57'!
-visitPlayingX: aPlayingXState
-
-	^lines add: 'Estado: Jugando X'! !
-
-!TerniLapilliConsole methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:13:02'!
-visitWonO: aWonOState
-
-	^lines add: 'Estado: Juego terminado - ¡Ganó O!!'! !
-
-!TerniLapilliConsole methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:13:07'!
-visitWonX: aWonXState
-
-	^lines add: 'Estado: Juego terminado - ¡Ganó X!!'! !
-
-"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
-
-!classDefinition: 'TerniLapilliConsole class' category: #TerniLapilliConsole!
-TerniLapilliConsole class
-	instanceVariableNames: ''!
-
-!TerniLapilliConsole class methodsFor: 'as yet unclassified' stamp: 'LTO 11/8/2018 19:34:53'!
-on: aGame
-	^ self new initializeOn: aGame! !
-
-
 !classDefinition: #TerniLapilliState category: #TerniLapilliConsole!
 Object subclass: #TerniLapilliState
 	instanceVariableNames: 'game'
@@ -2006,3 +1948,103 @@ SlidingX class
 isFor: aTerniLapilli 
 
 	^aTerniLapilli isPlayingO and: [ aTerniLapilli hasXMorePiecesToPlace not and: [ aTerniLapilli hasPlayerOWon not ]]! !
+
+
+!classDefinition: #TerniLapilliStateObserver category: #TerniLapilliConsole!
+Object subclass: #TerniLapilliStateObserver
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilliConsole'!
+
+!TerniLapilliStateObserver methodsFor: 'update' stamp: 'ft 11/11/2018 14:37:17'!
+update: aTerniLapilliState
+
+	self subclassResponsibility ! !
+
+
+!TerniLapilliStateObserver methodsFor: 'visiting' stamp: 'ft 11/11/2018 14:40:28'!
+visitPlayingO: aPlayingOState
+
+	self subclassResponsibility ! !
+
+!TerniLapilliStateObserver methodsFor: 'visiting' stamp: 'ft 11/11/2018 14:40:44'!
+visitPlayingX: aPlayingXState
+
+	self subclassResponsibility ! !
+
+!TerniLapilliStateObserver methodsFor: 'visiting' stamp: 'ft 11/11/2018 14:41:08'!
+visitWonO: aWonOState
+
+	self subclassResponsibility ! !
+
+!TerniLapilliStateObserver methodsFor: 'visiting' stamp: 'ft 11/11/2018 14:40:59'!
+visitWonX: aWonXState
+
+	self subclassResponsibility ! !
+
+
+!classDefinition: #Console category: #TerniLapilliConsole!
+TerniLapilliStateObserver subclass: #Console
+	instanceVariableNames: 'lines'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilliConsole'!
+
+!Console methodsFor: 'initialization' stamp: 'ft 11/10/2018 22:17:00'!
+initializeOn: aGame
+	aGame addStateObserver: self.
+	lines := OrderedCollection new! !
+
+
+!Console methodsFor: 'log' stamp: 'ft 11/10/2018 22:14:05'!
+update: newTerniLapilliState
+
+	"Pensar cómo implementar #lastPlay. Ahora devuelve un String."
+	
+	lines add: newTerniLapilliState lastPlay.
+	newTerniLapilliState accept: self! !
+
+
+!Console methodsFor: 'lines' stamp: 'ft 11/9/2018 10:26:56'!
+lines
+	^ lines! !
+
+
+!Console methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:12:50'!
+visitPlayingO: aPlayingOState
+
+	^lines add: 'Estado: Jugando O'! !
+
+!Console methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:12:57'!
+visitPlayingX: aPlayingXState
+
+	^lines add: 'Estado: Jugando X'! !
+
+!Console methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:13:02'!
+visitWonO: aWonOState
+
+	^lines add: 'Estado: Juego terminado - ¡Ganó O!!'! !
+
+!Console methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:13:07'!
+visitWonX: aWonXState
+
+	^lines add: 'Estado: Juego terminado - ¡Ganó X!!'! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Console class' category: #TerniLapilliConsole!
+Console class
+	instanceVariableNames: ''!
+
+!Console class methodsFor: 'instance creation' stamp: 'LTO 11/8/2018 19:34:53'!
+on: aGame
+	^ self new initializeOn: aGame! !
+
+
+!classDefinition: #Viewer category: #TerniLapilliConsole!
+TerniLapilliStateObserver subclass: #Viewer
+	instanceVariableNames: 'view'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilliConsole'!
