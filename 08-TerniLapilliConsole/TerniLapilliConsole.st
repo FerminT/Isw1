@@ -1098,23 +1098,17 @@ addObserver: anObserver
 	observers add: anObserver! !
 
 
-!ActiveVariable methodsFor: 'value' stamp: 'ft 11/9/2018 13:11:11'!
+!ActiveVariable methodsFor: 'value' stamp: 'ft 11/10/2018 21:03:31'!
 changeTo: newValue
 
 	value := newValue.
-	observers do: [ :anObserver | anObserver update: self]! !
+	observers do: [ :anObserver | anObserver update: value]! !
 
 
 !ActiveVariable methodsFor: 'messages' stamp: 'ft 11/9/2018 11:29:18'!
 doesNotUnderstand: aMessage
 
 	^aMessage sendTo: value! !
-
-
-!ActiveVariable methodsFor: 'visitors' stamp: 'ft 11/9/2018 13:07:56'!
-visitValueWith: aVisitor
-
-	value accept: aVisitor! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1397,15 +1391,15 @@ isTaken: aPosition
 	^ (playerXPositions includes: aPosition) or: [ playerOPositions includes: aPosition ].! !
 
 
-!TerniLapilli methodsFor: 'testing game result' stamp: 'HAW 11/8/2018 11:56:45'!
+!TerniLapilli methodsFor: 'testing game result' stamp: 'ft 11/10/2018 22:06:52'!
 hasPlayerOWon
 
-	^self hasWin: playerOPositions ! !
+	^self hasWin: playerOPositions! !
 
-!TerniLapilli methodsFor: 'testing game result' stamp: 'HAW 11/8/2018 11:56:55'!
+!TerniLapilli methodsFor: 'testing game result' stamp: 'ft 11/10/2018 22:07:03'!
 hasPlayerXWon
 	
-	^self hasWin: playerXPositions ! !
+	^self hasWin: playerXPositions! !
 
 !TerniLapilli methodsFor: 'testing game result' stamp: 'HAW 10/25/2017 13:32:14'!
 isOver
@@ -1525,10 +1519,13 @@ initializeOn: aGame
 	lines := OrderedCollection new! !
 
 
-!TerniLapilliConsole methodsFor: 'log' stamp: 'ft 11/9/2018 13:10:13'!
-update: activeVariable
+!TerniLapilliConsole methodsFor: 'log' stamp: 'ft 11/10/2018 22:14:05'!
+update: newTerniLapilliState
 
-	activeVariable visitValueWith: self! !
+	"Pensar cómo implementar #lastPlay. Ahora devuelve un String."
+	
+	lines add: newTerniLapilliState lastPlay.
+	newTerniLapilliState accept: self! !
 
 
 !TerniLapilliConsole methodsFor: 'lines' stamp: 'ft 11/9/2018 10:26:56'!
@@ -1536,24 +1533,25 @@ lines
 	^ lines! !
 
 
-!TerniLapilliConsole methodsFor: 'visiting' stamp: 'ft 11/9/2018 15:26:56'!
-visitGameOverState: aGameOverState
-
-	lines add: aGameOverState lastPlay.
-	game hasPlayerXWon ifTrue: [lines add: 'Estado: Juego terminado - ¡Ganó X!!'].
-	game hasPlayerOWon ifTrue: [lines add: 'Estado: Juego terminado - ¡Ganó O!!']! !
-
-!TerniLapilliConsole methodsFor: 'visiting' stamp: 'ft 11/9/2018 15:22:32'!
+!TerniLapilliConsole methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:12:50'!
 visitPlayingO: aPlayingOState
 
-	lines add: aPlayingOState lastPlay.
-	lines add: 'Estado: Jugando O'! !
+	^lines add: 'Estado: Jugando O'! !
 
-!TerniLapilliConsole methodsFor: 'visiting' stamp: 'ft 11/9/2018 15:22:57'!
+!TerniLapilliConsole methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:12:57'!
 visitPlayingX: aPlayingXState
 
-	lines add: aPlayingXState lastPlay.
-	lines add: 'Estado: Jugando X'! !
+	^lines add: 'Estado: Jugando X'! !
+
+!TerniLapilliConsole methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:13:02'!
+visitWonO: aWonOState
+
+	^lines add: 'Estado: Juego terminado - ¡Ganó O!!'! !
+
+!TerniLapilliConsole methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:13:07'!
+visitWonX: aWonXState
+
+	^lines add: 'Estado: Juego terminado - ¡Ganó X!!'! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1650,12 +1648,12 @@ lastPlay
 TerniLapilliState class
 	instanceVariableNames: ''!
 
-!TerniLapilliState class methodsFor: 'instance creation' stamp: 'HAW 11/8/2018 11:21:36'!
+!TerniLapilliState class methodsFor: 'instance creation' stamp: 'ft 11/10/2018 21:21:58'!
 for: aTerniLapilli 
 
 	| stateClass |
 	
-	stateClass := self allSubclasses detect: [:anStateClass | anStateClass isFor: aTerniLapilli ].	
+	stateClass := self allSubclasses detect: [:aStateClass | aStateClass isFor: aTerniLapilli ].	
 	^stateClass new initializeFor: aTerniLapilli ! !
 
 
@@ -1671,6 +1669,16 @@ TerniLapilliState subclass: #GameOverState
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TerniLapilliConsole'!
+
+!GameOverState methodsFor: 'testing game result' stamp: 'ft 11/10/2018 21:15:12'!
+hasPlayerOWon
+
+	self subclassResponsibility ! !
+
+!GameOverState methodsFor: 'testing game result' stamp: 'ft 11/10/2018 21:15:08'!
+hasPlayerXWon
+
+	self subclassResponsibility ! !
 
 !GameOverState methodsFor: 'testing game result' stamp: 'HAW 11/8/2018 12:15:43'!
 isOver
@@ -1700,10 +1708,10 @@ slideXFrom: aPosition to: anotherPostion
 	game error: game class canNotPlayWhenGameIsOverErrorMessage ! !
 
 
-!GameOverState methodsFor: 'visitors' stamp: 'ft 11/9/2018 15:26:26'!
+!GameOverState methodsFor: 'visitors' stamp: 'ft 11/10/2018 22:10:34'!
 accept: aTerniLapilliStateVisitor
 
-	aTerniLapilliStateVisitor visitGameOverState: self! !
+	self subclassResponsibility ! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -1711,10 +1719,58 @@ accept: aTerniLapilliStateVisitor
 GameOverState class
 	instanceVariableNames: ''!
 
-!GameOverState class methodsFor: 'state selection' stamp: 'HAW 11/8/2018 12:02:20'!
+!GameOverState class methodsFor: 'state selection' stamp: 'ft 11/10/2018 22:04:57'!
 isFor: aTerniLapilli 
 
-	^ aTerniLapilli hasPlayerXWon or: [ aTerniLapilli hasPlayerOWon ]! !
+	^false! !
+
+
+!classDefinition: #WonO category: #TerniLapilliConsole!
+GameOverState subclass: #WonO
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilliConsole'!
+
+!WonO methodsFor: 'visitors' stamp: 'ft 11/10/2018 22:10:52'!
+accept: aTerniLapilliStateVisitor
+
+	aTerniLapilliStateVisitor visitWonO: self! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'WonO class' category: #TerniLapilliConsole!
+WonO class
+	instanceVariableNames: ''!
+
+!WonO class methodsFor: 'state selection' stamp: 'ft 11/10/2018 22:07:27'!
+isFor: aTerniLapilli
+
+	^ aTerniLapilli hasPlayerOWon! !
+
+
+!classDefinition: #WonX category: #TerniLapilliConsole!
+GameOverState subclass: #WonX
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilliConsole'!
+
+!WonX methodsFor: 'visitors' stamp: 'ft 11/10/2018 22:10:56'!
+accept: aTerniLapilliStateVisitor
+
+	aTerniLapilliStateVisitor visitWonX: self! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'WonX class' category: #TerniLapilliConsole!
+WonX class
+	instanceVariableNames: ''!
+
+!WonX class methodsFor: 'state selection' stamp: 'ft 11/10/2018 22:07:36'!
+isFor: aTerniLapilli
+
+	^ aTerniLapilli hasPlayerXWon! !
 
 
 !classDefinition: #PlayingO category: #TerniLapilliConsole!
@@ -1894,7 +1950,6 @@ isPlacingX
 
 	^true! !
 
-
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'PlacingX class' category: #TerniLapilliConsole!
@@ -1941,7 +1996,6 @@ areAllXsOnTheBoard
 isSlidingX
 
 	^true! !
-
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
