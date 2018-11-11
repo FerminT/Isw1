@@ -5,32 +5,31 @@ TestCase subclass: #TerniLapilliConsoleTest
 	poolDictionaries: ''
 	category: 'TerniLapilliConsole'!
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 14:36:10'!
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:35:58'!
 test01CreateEmptyGameAndConsole
 
 	game _ TerniLapilli new.
 	console _ Console on: game.
 	
-	self assert: console lines isEmpty
+	self assert: console linesStream atEnd
 	! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 14:36:09'!
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:38:21'!
 test02FirstPlayIsLogged
 	game _ TerniLapilli new.
 	console _ Console on: game.
 	
 	game putXAt: 2@2.
 	
-	lines _ console lines.
+	lines _ console linesStream.
 	
-	self assert: lines size equals: 2.
-	self assertXMarkedMessageOn: 2@2 atLine: 1.
-	self assertPlayingOStateMessageAt: 2.
-	
+	self assertNextLineXMarkedMessageOn: 2@2.
+	self assertNextLinePlayingOStateMessage.
+	self assert: lines atEnd.
 	
 ! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 14:36:10'!
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:39:01'!
 test03SecondPlayIsLogged
 	game _ TerniLapilli new.
 	console _ Console on: game.
@@ -38,15 +37,15 @@ test03SecondPlayIsLogged
 	game putXAt: 2@2.
 	game putOAt: 1@1.
 	
-	lines _ console lines.
+	lines _ console linesStream.
 	
-	self assert: lines size equals: 4.
-	self assertXMarkedMessageOn: 2@2 atLine: 1.
-	self assertPlayingOStateMessageAt: 2.
-	self assertOMarkedMessageOn: 1@1 atLine: 3.
-	self assertPlayingXStateMessageAt: 4.! !
+	self assertNextLineXMarkedMessageOn: 2@2.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOMarkedMessageOn: 1@1.
+	self assertNextLinePlayingXStateMessage.
+	self assert: lines atEnd.! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 14:36:09'!
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:42:38'!
 test04aXWonStateIsLogged
 	game _ TerniLapilli new.
 	console _ Console on: game.
@@ -57,21 +56,21 @@ test04aXWonStateIsLogged
 	game putOAt: 1@2.
 	game putXAt: 3@1.
 	
-	lines _ console lines.
+	lines _ console linesStream.
 	
-	self assert: lines size equals: 10.
-	self assertXMarkedMessageOn: 2@2 atLine: 1.
-	self assertPlayingOStateMessageAt: 2.
-	self assertOMarkedMessageOn: 1@1 atLine: 3.
-	self assertPlayingXStateMessageAt: 4.
-	self assertXMarkedMessageOn: 1@3 atLine: 5.
-	self assertPlayingOStateMessageAt: 6.
-	self assertOMarkedMessageOn: 1@2 atLine: 7.
-	self assertPlayingXStateMessageAt: 8.
-	self assertXMarkedMessageOn: 3@1 atLine: 9.
-	self assertXWonStateMessageAt: 10! !
+	self assertNextLineXMarkedMessageOn: 2@2.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOMarkedMessageOn: 1@1.
+	self assertNextLinePlayingXStateMessage.
+	self assertNextLineXMarkedMessageOn: 1@3.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOMarkedMessageOn: 1@2.
+	self assertNextLinePlayingXStateMessage.
+	self assertNextLineXMarkedMessageOn: 3@1.
+	self assertNextLineXWonStateMessage.
+	self assert: lines atEnd.! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 14:36:10'!
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:50:19'!
 test04bOWonStateIsLogged
 	game _ TerniLapilli new.
 	console _ Console on: game.
@@ -83,23 +82,23 @@ test04bOWonStateIsLogged
 	game putXAt: 3@3.
 	game putOAt: 3@1.
 	
-	lines _ console lines.
+	lines _ console linesStream.
 	
-	self assert: lines size equals: 12.
-	self assertXMarkedMessageOn: 1@1 atLine: 1.
-	self assertPlayingOStateMessageAt: 2.
-	self assertOMarkedMessageOn: 2@2 atLine: 3.
-	self assertPlayingXStateMessageAt: 4.
-	self assertXMarkedMessageOn: 1@2 atLine: 5.
-	self assertPlayingOStateMessageAt: 6.
-	self assertOMarkedMessageOn: 1@3 atLine: 7.
-	self assertPlayingXStateMessageAt: 8.
-	self assertXMarkedMessageOn: 3@3 atLine: 9.
-	self assertPlayingOStateMessageAt: 10.
-	self assertOMarkedMessageOn: 3@1 atLine: 11.
-	self assertOWonStateMessageAt: 12! !
+	self assertNextLineXMarkedMessageOn: 1@1.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOMarkedMessageOn: 2@2.
+	self assertNextLinePlayingXStateMessage.
+	self assertNextLineXMarkedMessageOn: 1@2.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOMarkedMessageOn: 1@3.
+	self assertNextLinePlayingXStateMessage.
+	self assertNextLineXMarkedMessageOn: 3@3.
+	self assertNextLinePlayingOStateMessage.	
+	self assertNextLineOMarkedMessageOn: 3@1.
+	self assertNextLineOWonStateMessage.
+	self assert: lines atEnd! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 14:36:10'!
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:48:41'!
 test05SlidingXIsLogged
 	game _ TerniLapilli new.
 	console _ Console on: game.
@@ -112,25 +111,25 @@ test05SlidingXIsLogged
 	game putOAt: 2@3.
 	game slideXFrom: 1@3 to: 1@2.
 	
-	lines _ console lines.
+	lines _ console linesStream.
 	
-	self assert: lines size equals: 14.
-	self assertXMarkedMessageOn: 2@2 atLine: 1.
-	self assertPlayingOStateMessageAt: 2.
-	self assertOMarkedMessageOn: 1@1 atLine: 3.
-	self assertPlayingXStateMessageAt: 4.
-	self assertXMarkedMessageOn: 1@3 atLine: 5.
-	self assertPlayingOStateMessageAt: 6.
-	self assertOMarkedMessageOn: 3@1 atLine: 7.
-	self assertPlayingXStateMessageAt: 8.
-	self assertXMarkedMessageOn: 2@1 atLine: 9.
-	self assertPlayingOStateMessageAt: 10.
-	self assertOMarkedMessageOn: 2@3 atLine: 11.
-	self assertPlayingXStateMessageAt: 12.
-	self assertXSlidMessageOn: 1@3 to: 1@2 atLine: 13.
-	self assertPlayingOStateMessageAt: 14.! !
+	self assertNextLineXMarkedMessageOn: 2@2.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOMarkedMessageOn: 1@1.
+	self assertNextLinePlayingXStateMessage.
+	self assertNextLineXMarkedMessageOn: 1@3.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOMarkedMessageOn: 3@1.
+	self assertNextLinePlayingXStateMessage.
+	self assertNextLineXMarkedMessageOn: 2@1.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOMarkedMessageOn: 2@3.
+	self assertNextLinePlayingXStateMessage.
+	self assertNextLineXSlidMessageOn: 1@3 to: 1@2.
+	self assertNextLinePlayingOStateMessage.
+	self assert: lines atEnd.! !
 
-!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 14:36:10'!
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:49:43'!
 test06SlidingOIsLogged
 	game _ TerniLapilli new.
 	console _ Console on: game.
@@ -144,66 +143,66 @@ test06SlidingOIsLogged
 	game slideXFrom: 1@3 to: 1@2.
 	game slideOFrom: 3@1 to: 3@2.
 	
-	lines _ console lines.
+	lines _ console linesStream.
 	
-	self assert: lines size equals: 16.
-	self assertXMarkedMessageOn: 2@2 atLine: 1.
-	self assertPlayingOStateMessageAt: 2.
-	self assertOMarkedMessageOn: 1@1 atLine: 3.
-	self assertPlayingXStateMessageAt: 4.
-	self assertXMarkedMessageOn: 1@3 atLine: 5.
-	self assertPlayingOStateMessageAt: 6.
-	self assertOMarkedMessageOn: 3@1 atLine: 7.
-	self assertPlayingXStateMessageAt: 8.
-	self assertXMarkedMessageOn: 2@1 atLine: 9.
-	self assertPlayingOStateMessageAt: 10.
-	self assertOMarkedMessageOn: 2@3 atLine: 11.
-	self assertPlayingXStateMessageAt: 12.
-	self assertXSlidMessageOn: 1@3 to: 1@2 atLine: 13.
-	self assertPlayingOStateMessageAt: 14.
-	self assertOSlidMessageOn: 3@1 to: 3@2 atLine: 15.
-	self assertPlayingXStateMessageAt: 16.! !
+	self assertNextLineXMarkedMessageOn: 2@2.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOMarkedMessageOn: 1@1.
+	self assertNextLinePlayingXStateMessage.
+	self assertNextLineXMarkedMessageOn: 1@3.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOMarkedMessageOn: 3@1.
+	self assertNextLinePlayingXStateMessage.
+	self assertNextLineXMarkedMessageOn: 2@1.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOMarkedMessageOn: 2@3.
+	self assertNextLinePlayingXStateMessage.
+	self assertNextLineXSlidMessageOn: 1@3 to: 1@2.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOSlidMessageOn: 3@1 to: 3@2.
+	self assertNextLinePlayingXStateMessage.
+	self assert: lines atEnd.! !
 
 
-!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 20:48:18'!
-assertOMarkedMessageOn: aPosition atLine: index
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/11/2018 17:39:24'!
+assertNextLineOMarkedMessageOn: aPosition
 
-	self assert: (lines at: index) equals: 'O marcó en ', aPosition asString! !
+	self assert: lines nextLine equals: 'O marcó en ', aPosition asString! !
 
-!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 21:00:57'!
-assertOSlidMessageOn: aPosition to: anotherPosition atLine: index
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/11/2018 17:44:59'!
+assertNextLineOSlidMessageOn: aPosition to: anotherPosition
 
-	self assert: (lines at: index) equals: 'O deslizó hasta ', anotherPosition asString, ' desde ', aPosition asString! !
+	self assert: lines nextLine equals: 'O deslizó hasta ', anotherPosition asString, ' desde ', aPosition asString! !
 
-!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 20:52:56'!
-assertOWonStateMessageAt: index
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/11/2018 17:40:59'!
+assertNextLineOWonStateMessage
 
-	self assert: (lines at: index) equals: 'Estado: Juego terminado - ¡Ganó O!!'! !
+	self assert: lines nextLine equals: 'Estado: Juego terminado - ¡Ganó O!!'! !
 
-!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 20:49:05'!
-assertPlayingOStateMessageAt: index
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/11/2018 17:37:48'!
+assertNextLinePlayingOStateMessage
 
-	self assert: (lines at: index) equals: 'Estado: Jugando O'! !
+	self assert: lines nextLine equals: 'Estado: Jugando O'! !
 
-!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 20:49:12'!
-assertPlayingXStateMessageAt: index
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/11/2018 17:40:15'!
+assertNextLinePlayingXStateMessage
 
-	self assert: (lines at: index) equals: 'Estado: Jugando X'! !
+	self assert: lines nextLine equals: 'Estado: Jugando X'! !
 
-!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 20:45:39'!
-assertXMarkedMessageOn: aPosition atLine: index
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/11/2018 17:37:27'!
+assertNextLineXMarkedMessageOn: aPosition
 
-	self assert: (lines at: index) equals: 'X marcó en ', aPosition asString! !
+	self assert: lines nextLine equals: 'X marcó en ', aPosition asString! !
 
-!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 21:00:07'!
-assertXSlidMessageOn: aPosition to: anotherPosition atLine: index
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/11/2018 17:45:05'!
+assertNextLineXSlidMessageOn: aPosition to: anotherPosition
 
-	self assert: (lines at: index) equals: 'X deslizó hasta ', anotherPosition asString, ' desde ', aPosition asString! !
+	self assert: lines nextLine equals: 'X deslizó hasta ', anotherPosition asString, ' desde ', aPosition asString! !
 
-!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/8/2018 20:53:04'!
-assertXWonStateMessageAt: index
+!TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/11/2018 17:41:04'!
+assertNextLineXWonStateMessage
 
-	self assert: (lines at: index) equals: 'Estado: Juego terminado - ¡Ganó X!!'! !
+	self assert: lines nextLine equals: 'Estado: Juego terminado - ¡Ganó X!!'! !
 
 
 !classDefinition: #TerniLapilliTest category: #TerniLapilliConsole!
@@ -1078,6 +1077,160 @@ test40CanNotSlideOWhenPlayingX
 	! !
 
 
+!classDefinition: #TerniLapilliViewerTest category: #TerniLapilliConsole!
+TestCase subclass: #TerniLapilliViewerTest
+	instanceVariableNames: 'game viewer view'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilliConsole'!
+
+!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:01:06'!
+test01NewGameShowsEmptyBoard
+
+	game := TerniLapilli new.
+	viewer := Viewer on: game.
+	
+	view := viewer viewStream.
+	
+	self assert: view nextLine equals: ' | | '.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: ' | | '.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: ' | | '.
+	self assert: view atEnd! !
+
+!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:01:27'!
+test02PlacingXShowsOnBoard
+
+	game := TerniLapilli new.
+	viewer := Viewer on: game.
+	
+	game putXAt: 2@2.
+	
+	view := viewer viewStream.
+	
+	self assert: view nextLine equals: ' | | '.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: ' |X| '.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: ' | | '.
+	self assert: view nextLine equals: 'Playing O'.
+	self assert: view atEnd! !
+
+!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:01:36'!
+test03PlacingOShowsOnBoard
+
+	game := TerniLapilli new.
+	viewer := Viewer on: game.
+	
+	game putXAt: 2@2.
+	game putOAt: 3@1.
+	
+	view := viewer viewStream.
+	
+	self assert: view nextLine equals: ' | | '.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: ' |X| '.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: 'O| | '.
+	self assert: view nextLine equals: 'Playing X'.
+	self assert: view atEnd! !
+
+!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:03:23'!
+test04aXWonStateIsDisplayed
+
+	game := TerniLapilli new.
+	viewer := Viewer on: game.
+	
+	game putXAt: 2@2.
+	game putOAt: 3@1.
+	game putXAt: 1@1.
+	game putOAt: 2@1.
+	game putXAt: 3@3.
+	
+	view := viewer viewStream.
+	
+	self assert: view nextLine equals: 'X| | '.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: 'O|X| '.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: 'O| |X'.
+	self assert: view nextLine equals: 'X Won!!'.
+	self assert: view atEnd! !
+
+!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:04:37'!
+test04bOWonStateIsDisplayed
+
+	game := TerniLapilli new.
+	viewer := Viewer on: game.
+	
+	game putXAt: 2@2.
+	game putOAt: 3@1.
+	game putXAt: 1@2.
+	game putOAt: 2@1.
+	game putXAt: 1@3.
+	game putOAt: 1@1.
+	
+	view := viewer viewStream.
+	
+	self assert: view nextLine equals: 'O|X|X'.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: 'O|X| '.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: 'O| | '.
+	self assert: view nextLine equals: 'O Won!!'.
+	self assert: view atEnd! !
+
+!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:09:24'!
+test05SlidingXShowsOnBoard
+
+	game := TerniLapilli new.
+	viewer := Viewer on: game.
+	
+	game putXAt: 2@2.
+	game putOAt: 3@1.
+	game putXAt: 1@2.
+	game putOAt: 2@1.
+	game putXAt: 1@3.
+	game putOAt: 3@3.
+	game slideXFrom: 2@2 to: 3@2.
+	
+	view := viewer viewStream.
+	
+	self assert: view nextLine equals: ' |X|X'.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: 'O| | '.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: 'O|X|O'.
+	self assert: view nextLine equals: 'Playing O'.
+	self assert: view atEnd! !
+
+!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:10:12'!
+test06SlidingOShowsOnBoard
+
+	game := TerniLapilli new.
+	viewer := Viewer on: game.
+	
+	game putXAt: 2@2.
+	game putOAt: 3@1.
+	game putXAt: 1@2.
+	game putOAt: 2@1.
+	game putXAt: 1@3.
+	game putOAt: 3@3.
+	game slideXFrom: 2@2 to: 3@2.
+	game slideOFrom: 2@1 to: 1@1.
+	
+	view := viewer viewStream.
+	
+	self assert: view nextLine equals: 'O|X|X'.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: ' | | '.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: 'O|X|O'.
+	self assert: view nextLine equals: 'Playing X'.
+	self assert: view atEnd! !
+
+
 !classDefinition: #ActiveVariable category: #TerniLapilliConsole!
 Object subclass: #ActiveVariable
 	instanceVariableNames: 'value observers'
@@ -1204,7 +1357,7 @@ hasWin: positions
 		or: [ self hasDownDiagonal: positions ]]].! !
 
 
-!TerniLapilli methodsFor: 'initialization' stamp: 'ft 11/9/2018 15:10:55'!
+!TerniLapilli methodsFor: 'initialization' stamp: 'ft 11/11/2018 15:10:58'!
 initialize
 
 	playerXPositions := OrderedCollection new.
@@ -1232,13 +1385,13 @@ changeStateAfterAdding: aPosition to: positions
 	positions add: aPosition.
 	state changeTo: (TerniLapilliState for: self).! !
 
-!TerniLapilli methodsFor: 'marking board - private' stamp: 'ft 11/9/2018 15:16:00'!
+!TerniLapilli methodsFor: 'marking board - private' stamp: 'ft 11/11/2018 15:39:39'!
 putOWhenPlacingOAt: aPosition
 
 	self playerOHasPiecesToPlace.
 	self assertIsFree: aPosition.
 
-	lastPlay := 'O marcó en ', aPosition printString.
+	lastPlay := PlacingPlay for: 'O' in: aPosition.
 	self changeStateAfterAdding: aPosition to: playerOPositions.
 ! !
 
@@ -1262,13 +1415,13 @@ putXWhenPlacingOAt: aPoint
 	
 	self error: self class notXTurnErrorMessage! !
 
-!TerniLapilli methodsFor: 'marking board - private' stamp: 'ft 11/9/2018 15:15:48'!
+!TerniLapilli methodsFor: 'marking board - private' stamp: 'ft 11/11/2018 15:39:51'!
 putXWhenPlacingXAt: aPosition
 
 	self playerXHasPiecesToPlace.
 	self assertIsFree: aPosition.
 	
-	lastPlay := 'X marcó en ', aPosition printString.
+	lastPlay := PlacingPlay for: 'X' in: aPosition.
 	self changeStateAfterAdding: aPosition to: playerXPositions.
 	! !
 
@@ -1333,13 +1486,13 @@ slideOWhenPlayingXFrom: aPosition to: anotherPosition
 
 	self error: self class notOTurnErrorMessage ! !
 
-!TerniLapilli methodsFor: 'sliding - private' stamp: 'ft 11/9/2018 15:17:28'!
+!TerniLapilli methodsFor: 'sliding - private' stamp: 'ft 11/11/2018 15:39:01'!
 slideOWhenSlidingOFrom: aPosition to: anotherPosition
 	
 	self assertIsFree: anotherPosition .
 	self assertIsLegalMovementFrom: aPosition to: anotherPosition.
 	
-	lastPlay := 'O deslizó hasta ', anotherPosition printString, ' desde ', aPosition printString.
+	lastPlay := SlidingPlay for: 'O' from: aPosition to: anotherPosition.
 	playerOPositions remove: aPosition.
 	self changeStateAfterAdding: anotherPosition to: playerOPositions.! !
 
@@ -1353,13 +1506,13 @@ slideXWhenPlayingOFrom: aPosition to: anotherPosition
 
 	self error: self class notXTurnErrorMessage! !
 
-!TerniLapilli methodsFor: 'sliding - private' stamp: 'ft 11/9/2018 15:17:11'!
+!TerniLapilli methodsFor: 'sliding - private' stamp: 'ft 11/11/2018 15:39:18'!
 slideXWhenSlidingXFrom: aPosition to: anotherPosition
 	
 	self assertIsFree: anotherPosition .
 	self assertIsLegalMovementFrom: aPosition to: anotherPosition.
 	
-	lastPlay := 'X deslizó hasta ', anotherPosition printString, ' desde ', aPosition printString.
+	lastPlay := SlidingPlay for: 'X' from: aPosition to: anotherPosition.
 	playerXPositions remove: aPosition.
 	self changeStateAfterAdding: anotherPosition to: playerXPositions.! !
 
@@ -1503,6 +1656,99 @@ positionOutsideBoardErrorMessage
 positionTakenErrorMessage
 	
 	^'Position taken'! !
+
+
+!classDefinition: #TerniLapilliPlay category: #TerniLapilliConsole!
+Object subclass: #TerniLapilliPlay
+	instanceVariableNames: 'player'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilliConsole'!
+
+!TerniLapilliPlay methodsFor: 'accessing' stamp: 'ft 11/11/2018 15:35:24'!
+player
+
+	^ player! !
+
+
+!classDefinition: #PlacingPlay category: #TerniLapilliConsole!
+TerniLapilliPlay subclass: #PlacingPlay
+	instanceVariableNames: 'position'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilliConsole'!
+
+!PlacingPlay methodsFor: 'initialization' stamp: 'ft 11/11/2018 15:29:15'!
+initializeFor: aPlayer in: aPosition
+
+	player := aPlayer.
+	position := aPosition! !
+
+
+!PlacingPlay methodsFor: 'accessing' stamp: 'ft 11/11/2018 15:35:37'!
+position
+
+	^ position! !
+
+
+!PlacingPlay methodsFor: 'visitors' stamp: 'ft 11/11/2018 15:37:53'!
+accept: aVisitor
+
+	aVisitor visitPlacingPlay: self! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'PlacingPlay class' category: #TerniLapilliConsole!
+PlacingPlay class
+	instanceVariableNames: ''!
+
+!PlacingPlay class methodsFor: 'class initialization' stamp: 'ft 11/11/2018 15:28:47'!
+for: aPlayer in: aPosition
+
+	^self new initializeFor: aPlayer in: aPosition! !
+
+
+!classDefinition: #SlidingPlay category: #TerniLapilliConsole!
+TerniLapilliPlay subclass: #SlidingPlay
+	instanceVariableNames: 'origin destiny'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TerniLapilliConsole'!
+
+!SlidingPlay methodsFor: 'initialization' stamp: 'ft 11/11/2018 15:34:44'!
+initializeFor: aPlayer from: aPosition to: anotherPosition
+
+	player := aPlayer.
+	origin := aPosition.
+	destiny := anotherPosition! !
+
+
+!SlidingPlay methodsFor: 'accessing' stamp: 'ft 11/11/2018 15:36:02'!
+destiny
+
+	^ destiny! !
+
+!SlidingPlay methodsFor: 'accessing' stamp: 'ft 11/11/2018 15:35:54'!
+origin
+
+	^ origin! !
+
+
+!SlidingPlay methodsFor: 'visitors' stamp: 'ft 11/11/2018 15:37:23'!
+accept: aVisitor
+
+	aVisitor visitSlidingPlay: self! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'SlidingPlay class' category: #TerniLapilliConsole!
+SlidingPlay class
+	instanceVariableNames: ''!
+
+!SlidingPlay class methodsFor: 'class initialization' stamp: 'ft 11/11/2018 15:34:07'!
+for: aPlayer from: aPosition to: anotherPosition
+
+	 ^self new initializeFor: aPlayer from: aPosition to: anotherPosition! !
 
 
 !classDefinition: #TerniLapilliState category: #TerniLapilliConsole!
@@ -1991,45 +2237,54 @@ TerniLapilliStateObserver subclass: #Console
 	poolDictionaries: ''
 	category: 'TerniLapilliConsole'!
 
-!Console methodsFor: 'initialization' stamp: 'ft 11/10/2018 22:17:00'!
-initializeOn: aGame
-	aGame addStateObserver: self.
-	lines := OrderedCollection new! !
+!Console methodsFor: 'initialization' stamp: 'ft 11/11/2018 17:33:41'!
+initializeOn: aTerniLapilli
+
+	aTerniLapilli addStateObserver: self.
+	lines := ReadWriteStream on: String new! !
 
 
-!Console methodsFor: 'log' stamp: 'ft 11/10/2018 22:14:05'!
+!Console methodsFor: 'log' stamp: 'ft 11/11/2018 15:41:21'!
 update: newTerniLapilliState
-
-	"Pensar cómo implementar #lastPlay. Ahora devuelve un String."
 	
-	lines add: newTerniLapilliState lastPlay.
+	newTerniLapilliState lastPlay accept: self.
 	newTerniLapilliState accept: self! !
 
 
-!Console methodsFor: 'lines' stamp: 'ft 11/9/2018 10:26:56'!
-lines
-	^ lines! !
+!Console methodsFor: 'accessing' stamp: 'ft 11/11/2018 17:34:01'!
+linesStream
+	^ lines copy reset! !
 
 
-!Console methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:12:50'!
+!Console methodsFor: 'visiting' stamp: 'ft 11/11/2018 17:34:52'!
+visitPlacingPlay: aPlacingPlay
+
+	^lines nextPutAll: aPlacingPlay player, ' marcó en ', aPlacingPlay position printString; newLine.! !
+
+!Console methodsFor: 'visiting' stamp: 'ft 11/11/2018 17:34:42'!
 visitPlayingO: aPlayingOState
 
-	^lines add: 'Estado: Jugando O'! !
+	^lines nextPutAll: 'Estado: Jugando O'; newLine! !
 
-!Console methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:12:57'!
+!Console methodsFor: 'visiting' stamp: 'ft 11/11/2018 17:35:04'!
 visitPlayingX: aPlayingXState
 
-	^lines add: 'Estado: Jugando X'! !
+	^lines nextPutAll: 'Estado: Jugando X'; newLine! !
 
-!Console methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:13:02'!
+!Console methodsFor: 'visiting' stamp: 'ft 11/11/2018 17:35:13'!
+visitSlidingPlay: aSlidingPlay
+
+	^lines nextPutAll: aSlidingPlay player, ' deslizó hasta ', aSlidingPlay destiny printString, ' desde ', aSlidingPlay origin printString; newLine! !
+
+!Console methodsFor: 'visiting' stamp: 'ft 11/11/2018 17:35:22'!
 visitWonO: aWonOState
 
-	^lines add: 'Estado: Juego terminado - ¡Ganó O!!'! !
+	^lines nextPutAll: 'Estado: Juego terminado - ¡Ganó O!!'; newLine! !
 
-!Console methodsFor: 'visiting' stamp: 'ft 11/10/2018 22:13:07'!
+!Console methodsFor: 'visiting' stamp: 'ft 11/11/2018 17:35:30'!
 visitWonX: aWonXState
 
-	^lines add: 'Estado: Juego terminado - ¡Ganó X!!'! !
+	^lines nextPutAll: 'Estado: Juego terminado - ¡Ganó X!!'; newLine! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -2037,14 +2292,104 @@ visitWonX: aWonXState
 Console class
 	instanceVariableNames: ''!
 
-!Console class methodsFor: 'instance creation' stamp: 'LTO 11/8/2018 19:34:53'!
-on: aGame
-	^ self new initializeOn: aGame! !
+!Console class methodsFor: 'instance creation' stamp: 'ft 11/11/2018 15:03:47'!
+on: aTerniLapilli
+	^ self new initializeOn: aTerniLapilli! !
 
 
 !classDefinition: #Viewer category: #TerniLapilliConsole!
 TerniLapilliStateObserver subclass: #Viewer
-	instanceVariableNames: 'view'
+	instanceVariableNames: 'board state view'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TerniLapilliConsole'!
+
+!Viewer methodsFor: 'initialization' stamp: 'ft 11/11/2018 17:24:30'!
+initializeOn: aTerniLapilli
+
+	aTerniLapilli addStateObserver: self.
+	board := Array2D height: 3 width: 3.
+	1 to: 3 do: [:x |
+		1 to: 3 do: [:y |
+			board i: x j: y put: ' ']].
+	
+	view := ReadWriteStream on: String new.	
+	state := String new.! !
+
+
+!Viewer methodsFor: 'update' stamp: 'ft 11/11/2018 15:44:04'!
+update: newTerniLapilliState
+
+	newTerniLapilliState lastPlay accept: self.
+	newTerniLapilliState accept: self! !
+
+
+!Viewer methodsFor: 'visiting' stamp: 'ft 11/11/2018 15:52:34'!
+visitPlacingPlay: aPlacingPlay
+
+	board i: aPlacingPlay position x j: aPlacingPlay position y put: aPlacingPlay player! !
+
+!Viewer methodsFor: 'visiting' stamp: 'ft 11/11/2018 15:48:34'!
+visitPlayingO: aPlayingOState
+
+	state := 'Playing O'! !
+
+!Viewer methodsFor: 'visiting' stamp: 'ft 11/11/2018 15:48:45'!
+visitPlayingX: aPlayingXState
+
+	state := 'Playing X'! !
+
+!Viewer methodsFor: 'visiting' stamp: 'ft 11/11/2018 15:52:22'!
+visitSlidingPlay: aSlidingPlay
+
+	board i: aSlidingPlay origin x j: aSlidingPlay origin y put: ' '.
+	board i: aSlidingPlay destiny x j: aSlidingPlay destiny y put: aSlidingPlay player! !
+
+!Viewer methodsFor: 'visiting' stamp: 'ft 11/11/2018 15:48:56'!
+visitWonO: aWonOState
+
+	state := 'O Won!!'! !
+
+!Viewer methodsFor: 'visiting' stamp: 'ft 11/11/2018 15:49:05'!
+visitWonX: aWonXState
+
+	state := 'X Won!!'! !
+
+
+!Viewer methodsFor: 'accessing' stamp: 'ft 11/11/2018 17:30:49'!
+viewStream
+
+	self parseRow: 1.
+	self addSeparator.
+	self parseRow: 2.
+	self addSeparator.
+	self parseRow: 3.
+	
+	view nextPutAll: state.
+	
+	^view reset copy! !
+
+
+!Viewer methodsFor: 'parsing - private' stamp: 'ft 11/11/2018 17:27:33'!
+addSeparator
+
+	view nextPutAll: '-----'; newLine! !
+
+!Viewer methodsFor: 'parsing - private' stamp: 'ft 11/11/2018 17:28:43'!
+parseRow: anIndex
+
+	1 to: 3 do: [ :y | 
+		view nextPutAll: (board i: anIndex j: y).
+		y < 3 ifTrue: [view nextPut: $|]].
+	view newLine! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'Viewer class' category: #TerniLapilliConsole!
+Viewer class
+	instanceVariableNames: ''!
+
+!Viewer class methodsFor: 'instance creation' stamp: 'ft 11/11/2018 15:03:36'!
+on: aTerniLapilli
+
+	^self new initializeOn: aTerniLapilli! !
