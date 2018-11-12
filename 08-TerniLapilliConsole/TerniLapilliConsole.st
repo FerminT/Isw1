@@ -2209,6 +2209,11 @@ update: aTerniLapilliState
 	self subclassResponsibility ! !
 
 
+!TerniLapilliStateObserver methodsFor: 'visiting' stamp: 'ft 11/12/2018 09:28:12'!
+visitPlacingPlay: aPlacingPlay
+
+	self subclassResponsibility ! !
+
 !TerniLapilliStateObserver methodsFor: 'visiting' stamp: 'ft 11/11/2018 14:40:28'!
 visitPlayingO: aPlayingOState
 
@@ -2216,6 +2221,11 @@ visitPlayingO: aPlayingOState
 
 !TerniLapilliStateObserver methodsFor: 'visiting' stamp: 'ft 11/11/2018 14:40:44'!
 visitPlayingX: aPlayingXState
+
+	self subclassResponsibility ! !
+
+!TerniLapilliStateObserver methodsFor: 'visiting' stamp: 'ft 11/12/2018 09:28:23'!
+visitSlidingPlay: aSlidingPlay
 
 	self subclassResponsibility ! !
 
