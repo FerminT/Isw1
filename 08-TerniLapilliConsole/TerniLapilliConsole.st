@@ -163,6 +163,49 @@ test06SlidingOIsLogged
 	self assertNextLinePlayingXStateMessage.
 	self assert: lines atEnd.! !
 
+!TerniLapilliConsoleTest methodsFor: 'Testing' stamp: 'LTO 11/12/2018 16:05:12'!
+test07UseConsoleAndViewer
+	| viewer view |
+	game _ TerniLapilli new.
+	console _ Console on: game.
+	viewer := Viewer on: game.
+	
+	game putXAt: 2@2.
+	game putOAt: 1@1.
+	game putXAt: 1@3.
+	game putOAt: 3@1.
+	game putXAt: 2@1.
+	game putOAt: 2@3.
+	game slideXFrom: 1@3 to: 1@2.
+	
+	lines _ console linesStream.
+	
+	self assertNextLineXMarkedMessageOn: 2@2.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOMarkedMessageOn: 1@1.
+	self assertNextLinePlayingXStateMessage.
+	self assertNextLineXMarkedMessageOn: 1@3.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOMarkedMessageOn: 3@1.
+	self assertNextLinePlayingXStateMessage.
+	self assertNextLineXMarkedMessageOn: 2@1.
+	self assertNextLinePlayingOStateMessage.
+	self assertNextLineOMarkedMessageOn: 2@3.
+	self assertNextLinePlayingXStateMessage.
+	self assertNextLineXSlidMessageOn: 1@3 to: 1@2.
+	self assertNextLinePlayingOStateMessage.
+	self assert: lines atEnd.
+	
+	view := viewer viewStream.
+	
+	self assert: view nextLine equals: 'O|X| '.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: 'X|X|O'.
+	self assert: view nextLine equals: '-----'.
+	self assert: view nextLine equals: 'O| | '.
+	self assert: view nextLine equals: 'Playing O'.
+	self assert: view atEnd! !
+
 
 !TerniLapilliConsoleTest methodsFor: 'assertions' stamp: 'ft 11/11/2018 17:39:24'!
 assertNextLineOMarkedMessageOn: aPosition
@@ -1084,7 +1127,29 @@ TestCase subclass: #TerniLapilliViewerTest
 	poolDictionaries: ''
 	category: 'TerniLapilliConsole'!
 
-!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:01:06'!
+!TerniLapilliViewerTest methodsFor: 'assertions' stamp: 'LTO 11/12/2018 16:02:26'!
+assertNextLineIsSeparator
+	self assert: view nextLine equals: '-----'.
+! !
+
+!TerniLapilliViewerTest methodsFor: 'assertions' stamp: 'LTO 11/12/2018 15:57:44'!
+assertNextLineOWon
+	self assert: view nextLine equals: 'O Won!!'.! !
+
+!TerniLapilliViewerTest methodsFor: 'assertions' stamp: 'LTO 11/12/2018 15:56:30'!
+assertNextLinePlayingO
+	self assert: view nextLine equals: 'Playing O'.! !
+
+!TerniLapilliViewerTest methodsFor: 'assertions' stamp: 'LTO 11/12/2018 15:56:59'!
+assertNextLinePlayingX
+	self assert: view nextLine equals: 'Playing X'.! !
+
+!TerniLapilliViewerTest methodsFor: 'assertions' stamp: 'LTO 11/12/2018 15:57:27'!
+assertNextLineXWon
+	self assert: view nextLine equals: 'X Won!!'.! !
+
+
+!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'LTO 11/12/2018 16:02:55'!
 test01NewGameShowsEmptyBoard
 
 	game := TerniLapilli new.
@@ -1093,13 +1158,13 @@ test01NewGameShowsEmptyBoard
 	view := viewer viewStream.
 	
 	self assert: view nextLine equals: ' | | '.
-	self assert: view nextLine equals: '-----'.
+	self assertNextLineIsSeparator.
 	self assert: view nextLine equals: ' | | '.
-	self assert: view nextLine equals: '-----'.
+	self assertNextLineIsSeparator.
 	self assert: view nextLine equals: ' | | '.
 	self assert: view atEnd! !
 
-!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:01:27'!
+!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'LTO 11/12/2018 16:02:40'!
 test02PlacingXShowsOnBoard
 
 	game := TerniLapilli new.
@@ -1110,14 +1175,14 @@ test02PlacingXShowsOnBoard
 	view := viewer viewStream.
 	
 	self assert: view nextLine equals: ' | | '.
-	self assert: view nextLine equals: '-----'.
+	self assertNextLineIsSeparator.
 	self assert: view nextLine equals: ' |X| '.
-	self assert: view nextLine equals: '-----'.
+	self assertNextLineIsSeparator.
 	self assert: view nextLine equals: ' | | '.
-	self assert: view nextLine equals: 'Playing O'.
+	self assertNextLinePlayingO.
 	self assert: view atEnd! !
 
-!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:01:36'!
+!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'LTO 11/12/2018 16:03:03'!
 test03PlacingOShowsOnBoard
 
 	game := TerniLapilli new.
@@ -1129,14 +1194,14 @@ test03PlacingOShowsOnBoard
 	view := viewer viewStream.
 	
 	self assert: view nextLine equals: ' | | '.
-	self assert: view nextLine equals: '-----'.
+	self assertNextLineIsSeparator.
 	self assert: view nextLine equals: ' |X| '.
-	self assert: view nextLine equals: '-----'.
+	self assertNextLineIsSeparator.
 	self assert: view nextLine equals: 'O| | '.
-	self assert: view nextLine equals: 'Playing X'.
+	self assertNextLinePlayingX.
 	self assert: view atEnd! !
 
-!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:03:23'!
+!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'LTO 11/12/2018 16:03:08'!
 test04aXWonStateIsDisplayed
 
 	game := TerniLapilli new.
@@ -1151,14 +1216,14 @@ test04aXWonStateIsDisplayed
 	view := viewer viewStream.
 	
 	self assert: view nextLine equals: 'X| | '.
-	self assert: view nextLine equals: '-----'.
+	self assertNextLineIsSeparator.
 	self assert: view nextLine equals: 'O|X| '.
-	self assert: view nextLine equals: '-----'.
+	self assertNextLineIsSeparator.
 	self assert: view nextLine equals: 'O| |X'.
-	self assert: view nextLine equals: 'X Won!!'.
+	self assertNextLineXWon.
 	self assert: view atEnd! !
 
-!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:04:37'!
+!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'LTO 11/12/2018 16:03:17'!
 test04bOWonStateIsDisplayed
 
 	game := TerniLapilli new.
@@ -1174,14 +1239,14 @@ test04bOWonStateIsDisplayed
 	view := viewer viewStream.
 	
 	self assert: view nextLine equals: 'O|X|X'.
-	self assert: view nextLine equals: '-----'.
+	self assertNextLineIsSeparator.
 	self assert: view nextLine equals: 'O|X| '.
-	self assert: view nextLine equals: '-----'.
+	self assertNextLineIsSeparator.
 	self assert: view nextLine equals: 'O| | '.
-	self assert: view nextLine equals: 'O Won!!'.
+	self assertNextLineOWon.
 	self assert: view atEnd! !
 
-!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:09:24'!
+!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'LTO 11/12/2018 16:03:24'!
 test05SlidingXShowsOnBoard
 
 	game := TerniLapilli new.
@@ -1198,14 +1263,14 @@ test05SlidingXShowsOnBoard
 	view := viewer viewStream.
 	
 	self assert: view nextLine equals: ' |X|X'.
-	self assert: view nextLine equals: '-----'.
+	self assertNextLineIsSeparator.
 	self assert: view nextLine equals: 'O| | '.
-	self assert: view nextLine equals: '-----'.
+	self assertNextLineIsSeparator.
 	self assert: view nextLine equals: 'O|X|O'.
-	self assert: view nextLine equals: 'Playing O'.
+	self assertNextLinePlayingO.
 	self assert: view atEnd! !
 
-!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'ft 11/11/2018 17:10:12'!
+!TerniLapilliViewerTest methodsFor: 'Testing' stamp: 'LTO 11/12/2018 16:03:33'!
 test06SlidingOShowsOnBoard
 
 	game := TerniLapilli new.
@@ -1223,11 +1288,11 @@ test06SlidingOShowsOnBoard
 	view := viewer viewStream.
 	
 	self assert: view nextLine equals: 'O|X|X'.
-	self assert: view nextLine equals: '-----'.
+	self assertNextLineIsSeparator.
 	self assert: view nextLine equals: ' | | '.
-	self assert: view nextLine equals: '-----'.
+	self assertNextLineIsSeparator.
 	self assert: view nextLine equals: 'O|X|O'.
-	self assert: view nextLine equals: 'Playing X'.
+	self assertNextLinePlayingX.
 	self assert: view atEnd! !
 
 
