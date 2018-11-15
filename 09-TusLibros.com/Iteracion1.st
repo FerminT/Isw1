@@ -117,22 +117,28 @@ test06ShoppingCartCheckoutRemovesBooksFromLibrary
 	self assert: (library contains: book2 withAmount: 0).
 	self assert: cart amountOfBooks equals: 0! !
 
-!OnlineLibraryTests methodsFor: 'Testing' stamp: 'ft 11/15/2018 11:34:13'!
-test07CantBuyMoreBooksThanThereAreAtLibrary
+!OnlineLibraryTests methodsFor: 'Testing' stamp: 'ft 11/15/2018 12:28:12'!
+test07ShoppingCartCantBuyMoreBooksThanThereAreAtLibrary
 
-	| book1 |
+	| book1 cart2 |
 
 	library := OnlineLibrary new.
+	cart := ShoppingCart for: library.
+	cart2 := ShoppingCart for: library.
 
 	book1 := 1234567890123.
 	
-	library register: book1 amount: 5.
+	library register: book1 amount: 2.
+	cart add: book1 amount: 2.
+	cart2 add: book1.	
+	
+	cart checkout.
 	
 	self
-		should: [library buy: book1 amount: 10]
+		should: [cart2 checkout]
 		raise: Error
-		withExceptionDo: [ :anInvalidOnlineLibrary |
-			self assert: OnlineLibrary notEnoughCopiesOfBookToSell = anInvalidOnlineLibrary messageText].! !
+		withExceptionDo: [ :anInvalidShoppingCart |
+			self assert: OnlineLibrary notEnoughCopiesOfBookToSell = anInvalidShoppingCart messageText].! !
 
 
 !classDefinition: #OnlineLibrary category: #OnlineLibrary!
