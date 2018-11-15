@@ -94,8 +94,8 @@ test05CantAddMoreBooksToShoppingCartThanAmountThatIsInLibrary
 	self assert: cart amountOfBooks equals: 0.
 	self assert: (cart bookAmount: book) equals: 0.! !
 
-!OnlineLibraryTests methodsFor: 'Testing' stamp: 'ft 11/15/2018 10:13:05'!
-test06ShoppingCartCheckOutRemovesBooksFromLibrary
+!OnlineLibraryTests methodsFor: 'Testing' stamp: 'ft 11/15/2018 11:37:24'!
+test06ShoppingCartCheckoutRemovesBooksFromLibrary
 
 	| book1 book2 |
 
@@ -114,25 +114,25 @@ test06ShoppingCartCheckOutRemovesBooksFromLibrary
 	cart checkout.
 		
 	self assert: (library contains: book1 withAmount: 0).
-	self assert: (library contains: book2 withAmount: 0).! !
+	self assert: (library contains: book2 withAmount: 0).
+	self assert: cart amountOfBooks equals: 0! !
 
-!OnlineLibraryTests methodsFor: 'Testing' stamp: 'ft 11/15/2018 10:14:27'!
+!OnlineLibraryTests methodsFor: 'Testing' stamp: 'ft 11/15/2018 11:34:13'!
 test07CantBuyMoreBooksThanThereAreAtLibrary
 
 	| book1 |
 
 	library := OnlineLibrary new.
-	cart := ShoppingCart for: library.
-	
+
 	book1 := 1234567890123.
 	
-	library register: book1 amount: 2.
+	library register: book1 amount: 5.
 	
 	self
-		should: [library buy: book1 amount: 5]
+		should: [library buy: book1 amount: 10]
 		raise: Error
-		withExceptionDo: [ :anInvalidLibrary |
-			self assert: OnlineLibrary notEnoughCopiesOfBookToSell = anInvalidLibrary messageText].! !
+		withExceptionDo: [ :anInvalidOnlineLibrary |
+			self assert: OnlineLibrary notEnoughCopiesOfBookToSell = anInvalidOnlineLibrary messageText].! !
 
 
 !classDefinition: #OnlineLibrary category: #OnlineLibrary!
@@ -153,23 +153,23 @@ contains: aBook
 
 	^ books includesKey: aBook! !
 
-!OnlineLibrary methodsFor: 'accessing' stamp: 'LTO 11/14/2018 19:47:37'!
+!OnlineLibrary methodsFor: 'accessing' stamp: 'ft 11/15/2018 11:30:16'!
 contains: aBook withAmount: anAmount
 
-	^ (self contains: aBook) ifTrue: [^(books at: aBook) = anAmount]! !
+	^ (self contains: aBook) and: [(books at: aBook) = anAmount]! !
 
-!OnlineLibrary methodsFor: 'accessing' stamp: 'LTO 11/14/2018 19:48:30'!
+!OnlineLibrary methodsFor: 'accessing' stamp: 'ft 11/15/2018 11:29:59'!
 contains: aBook withAtLeast: anAmount
 
-	^ (self contains: aBook) ifTrue: [^(books at: aBook) >= anAmount]! !
+	^ (self contains: aBook) and: [(books at: aBook) >= anAmount]! !
 
 
-!OnlineLibrary methodsFor: 'operations' stamp: 'ft 11/15/2018 10:12:02'!
+!OnlineLibrary methodsFor: 'operations' stamp: 'ft 11/15/2018 11:31:29'!
 buy: aBook amount: anAmount
 
 	| amountInStock |
-	
-	((self contains: aBook) and: [self contains: aBook withAtLeast: anAmount]) ifFalse: [^ self error: self class notEnoughCopiesOfBookToSell].
+
+	(self contains: aBook withAtLeast: anAmount) ifFalse: [^ self error: self class notEnoughCopiesOfBookToSell].
 	 
 	amountInStock _ (books at: aBook) - anAmount.
 
