@@ -5,8 +5,8 @@ TestCase subclass: #CartTest
 	poolDictionaries: ''
 	category: 'Iteracion2'!
 !CartTest commentStamp: '<historical>' prior: 0!
-- Hacer que catalogo sea la lista de precios
-- Cuando el cashier hace checkout, le dice al carrito sumalizate y te devuelve el total
+- Hacer que catalogo sea la lista de precios (LISTO)
+- Cuando el cashier hace checkout, le dice al carrito sumalizate y te devuelve el total (LISTO)
 - Hacer la parte de tarjeta de credito de alguna manera
 -- Armar clase de interfaz que haga implementaciones simples de todo para responder. !
 
@@ -97,103 +97,87 @@ test08CartRemembersTheNumberOfAddedItems
 	cart add: 2 of: self itemSoldByTheStore.
 	self assert: (cart occurrencesOf: self itemSoldByTheStore) = 2! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 18:51:14'!
-test09CashierCantCheckoutEmptyCar
+!CartTest methodsFor: 'tests' stamp: 'ft 11/18/2018 17:11:46'!
+test09CashierCantCheckoutEmptyCart
 
-	| cart cashier priceList |
+	| cart cashier creditCard |
 	
 	cart := self createCart.
-	priceList := Dictionary new.
-	cashier _ Cashier withPriceList: priceList.
+	cashier := self createCashier.
+	creditCard := self createCreditCard.
 	
 	self
-		should: [cashier checkout: cart]
+		should: [cashier checkout: cart with: creditCard]
 		raise: Error
 		withExceptionDo: [ :anError |
-			self assert: anError messageText = Cashier emptyCartErrorMessage. ]! !
+			self assert: anError messageText = Cashier emptyCartErrorMessage.
+			self assert: cashier totalSales equals: 0]! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:28'!
-test10CashierCheckoutWithOneItem
+!CartTest methodsFor: 'tests' stamp: 'ft 11/18/2018 17:28:59'!
+test10CashierCanCheckoutCartWithOneItem
 
-	| cart cashier |
+	| cart cashier creditCard |
 	
 	cart _ self createCart.
 	cashier _ self createCashier.
+	creditCard _ self createCreditCard.
 	
 	cart add: self itemSoldByTheStore.
 	
-	self assert: (cashier checkout: cart) equals: 10.
-	! !
+	self assert: (cashier checkout: cart with: creditCard) equals: 10.
+	self assert: cashier totalSales equals: 10.! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:28'!
-test11CashierCheckoutWithTwoDifferentItems
+!CartTest methodsFor: 'tests' stamp: 'ft 11/18/2018 17:29:29'!
+test11CashierCanCheckoutCartWithTwoDifferentItemsAndReturnsItsTotal
 
-	| cart cashier |
+	| cart cashier creditCard |
 	
 	cart _ self createCart.
 	cashier _ self createCashier.
+	creditCard _ self createCreditCard.
 	
 	cart add: self itemSoldByTheStore.
-	cart add: (self defaultCatalog at: 2).
+	cart add: self anotherItemSoldByTheStore.
 	
-	self assert: (cashier checkout: cart) equals: 13.
+	self assert: (cashier checkout: cart with: creditCard) equals: 13.
+	self assert: cashier totalSales equals: 13.
 	! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:37:27'!
-test12CashierCantCheckoutAnItemWithoutPrice
 
-	| cart cashier |
-	cart _ Cart acceptingItemsOf: (Array with: self itemNotSoldByTheStore).
-	cashier _ self createCashier.
+!CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 16:52:40'!
+anotherItemSoldByTheStore
 	
-	cart add: self itemNotSoldByTheStore.
-	
-	self
-		should: [cashier checkout: cart]
-		raise: Error
-		withExceptionDo: [ :anError |
-			self assert: anError messageText = Cashier itemWithoutPriceErrorMessage. ]
-	! !
-
+	^ '12345'! !
 
 !CartTest methodsFor: 'support' stamp: 'HernanWilkinson 6/17/2013 17:48'!
 createCart
 	
 	^Cart acceptingItemsOf: self defaultCatalog! !
 
-!CartTest methodsFor: 'support' stamp: 'LTO 11/15/2018 18:59:43'!
+!CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 16:55:19'!
 createCashier
 	
-	^Cashier withPriceList: self defaultPriceList! !
+	^Cashier new! !
 
-!CartTest methodsFor: 'support' stamp: 'LTO 11/15/2018 19:34:28'!
+!CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 17:19:18'!
+createCreditCard
+	
+	^CreditCard firstName: 'Diego' lastName: 'Maradona' number: 1234567890123456 expirationDate: (GregorianMonthOfYear novemberOf: 2022)! !
+
+!CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 17:26:58'!
 defaultCatalog
 	
-	^ Array with: self itemSoldByTheStore with: self moreItemsSoldByTheStore! !
-
-!CartTest methodsFor: 'support' stamp: 'LTO 11/15/2018 19:34:28'!
-defaultPriceList
-	| priceList |
-	priceList _ Dictionary new.
-	self defaultCatalog do: [:anItem | priceList add: (Association key: anItem value: 3)].
-	priceList add: (Association key:self itemSoldByTheStore value: 10).
-	^ priceList
-! !
+	^Dictionary newFromPairs: (Array with: self itemSoldByTheStore with: 10 with: self anotherItemSoldByTheStore with: 3)! !
 
 !CartTest methodsFor: 'support' stamp: 'LTO 11/15/2018 19:34:49'!
 itemNotSoldByTheStore
 	
 	^'invalidBook'! !
 
-!CartTest methodsFor: 'support' stamp: 'LTO 11/15/2018 19:34:28'!
+!CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 16:30:36'!
 itemSoldByTheStore
 	
-	^ '1234567'! !
-
-!CartTest methodsFor: 'support' stamp: 'LTO 11/15/2018 19:01:40'!
-moreItemsSoldByTheStore
-	
-	^ #('1235', '568')! !
+	^'1234567'! !
 
 
 !classDefinition: #Cart category: #Iteracion2!
@@ -214,10 +198,10 @@ invalidQuantityErrorMessage
 	^'Invalid number of items'! !
 
 
-!Cart methodsFor: 'assertions' stamp: 'HernanWilkinson 6/17/2013 17:51'!
+!Cart methodsFor: 'assertions' stamp: 'ft 11/18/2018 16:33:25'!
 assertIsValidItem: anItem
 
-	(catalog includes: anItem) ifFalse: [ self error: self invalidItemErrorMessage ]! !
+	(catalog includesKey: anItem) ifFalse: [ self error: self invalidItemErrorMessage ]! !
 
 !Cart methodsFor: 'assertions' stamp: 'HernanWilkinson 6/17/2013 17:51'!
 assertIsValidQuantity: aQuantity
@@ -240,6 +224,13 @@ amountOfItems
 occurrencesOf: anItem
 
 	^items occurrencesOf: anItem  ! !
+
+!Cart methodsFor: 'queries' stamp: 'ft 11/18/2018 16:40:27'!
+totalPrice
+
+	^items 
+		inject: 0
+		into: [ :sum :anItem | sum + (catalog at: anItem)]! !
 
 
 !Cart methodsFor: 'testing' stamp: 'HernanWilkinson 6/17/2013 17:44'!
@@ -291,31 +282,43 @@ emptyCartErrorMessage
 
 !classDefinition: #Cashier category: #Iteracion2!
 Object subclass: #Cashier
-	instanceVariableNames: 'priceList'
+	instanceVariableNames: 'salesRegister'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Iteracion2'!
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'LTO 11/15/2018 19:43:20'!
-assertAllItemsInPriceList: aCart
-	! !
+!Cashier methodsFor: 'operations' stamp: 'ft 11/18/2018 17:16:19'!
+checkout: aCart with: aCreditCard
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'LTO 11/15/2018 19:40:42'!
-checkout: aCart
-	| receipt lastItem|
+	| total |
+
 	aCart isEmpty ifTrue: [ ^ self error: self class emptyCartErrorMessage ].
-	self assertAllItemsInPriceList: aCart.
-	receipt _ 0.
 	
-	1 to: aCart amountOfItems do: [ :item | 
-		lastItem _ aCart removeAnItem.
-		receipt _ receipt + (priceList at: lastItem)
-	].
-	^ receipt! !
+	total := aCart totalPrice.
+	salesRegister add: (Association key: aCreditCard value: total).
+	
+	^ total! !
 
-!Cashier methodsFor: 'as yet unclassified' stamp: 'LTO 11/15/2018 18:49:50'!
-initializeWithPrices: aPriceList
-	priceList _ aPriceList ! !
+
+!Cashier methodsFor: 'initialization' stamp: 'ft 11/18/2018 17:02:58'!
+initialize
+
+	salesRegister := Dictionary new! !
+
+
+!Cashier methodsFor: 'accessing' stamp: 'ft 11/18/2018 17:04:49'!
+getSales: aCreditCard
+
+	(salesRegister includesKey: aCreditCard) ifFalse: [^self error: self class creditCardNotRegisteredErrorMessage].
+
+	^salesRegister at: aCreditCard! !
+
+!Cashier methodsFor: 'accessing' stamp: 'ft 11/18/2018 17:08:23'!
+totalSales
+
+	^salesRegister values
+		inject: 0
+		into: [ :total :aSale | total + aSale]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -323,14 +326,56 @@ initializeWithPrices: aPriceList
 Cashier class
 	instanceVariableNames: ''!
 
-!Cashier class methodsFor: 'as yet unclassified' stamp: 'LTO 11/15/2018 18:48:28'!
+!Cashier class methodsFor: 'error messages' stamp: 'ft 11/18/2018 17:06:30'!
+creditCardNotRegisteredErrorMessage
+
+	^'The requested credit card has not made any buys yet'! !
+
+!Cashier class methodsFor: 'error messages' stamp: 'LTO 11/15/2018 18:48:28'!
 emptyCartErrorMessage
 	^ 'Cannot checkout empty cart'! !
 
-!Cashier class methodsFor: 'as yet unclassified' stamp: 'LTO 11/15/2018 19:38:07'!
+!Cashier class methodsFor: 'error messages' stamp: 'LTO 11/15/2018 19:38:07'!
 itemWithoutPriceErrorMessage
 	^ 'Cart contains an item thats not in the price list'! !
 
-!Cashier class methodsFor: 'as yet unclassified' stamp: 'LTO 11/15/2018 18:49:24'!
-withPriceList: aPriceList
-	^ self new initializeWithPrices: aPriceList ! !
+
+!classDefinition: #CreditCard category: #Iteracion2!
+Object subclass: #CreditCard
+	instanceVariableNames: 'number firstName lastName expirationDate'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'Iteracion2'!
+
+!CreditCard methodsFor: 'initialization' stamp: 'ft 11/18/2018 17:26:07'!
+initializeFirstName: aFirstName lastName: aSurname number: aNumber expirationDate: aMonthOfYear
+
+	firstName := aFirstName.
+	lastName := aSurname.
+	number := aNumber.
+	expirationDate := aMonthOfYear! !
+
+
+!CreditCard methodsFor: 'testing' stamp: 'ft 11/18/2018 17:34:25'!
+hasExpired: fromMonthOfYear
+
+	^expirationDate < fromMonthOfYear! !
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'CreditCard class' category: #Iteracion2!
+CreditCard class
+	instanceVariableNames: ''!
+
+!CreditCard class methodsFor: 'class initialization' stamp: 'ft 11/18/2018 17:26:15'!
+firstName: aName lastName: aSurname number: aNumber expirationDate: aMonthOfYear
+
+	aNumber printString size ~= 16 ifTrue: [^self error: self wrongAmountOfDigitsErrorMessage].
+	
+	^self new initializeFirstName: aName lastName: aSurname number: aNumber expirationDate: aMonthOfYear! !
+
+
+!CreditCard class methodsFor: 'error messages' stamp: 'ft 11/18/2018 17:24:37'!
+wrongAmountOfDigitsErrorMessage
+
+	^'There must be 16 digits for a credit card number to be valid'! !
