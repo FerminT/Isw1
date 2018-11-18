@@ -7,8 +7,10 @@ TestCase subclass: #CartTest
 !CartTest commentStamp: '<historical>' prior: 0!
 - Hacer que catalogo sea la lista de precios (LISTO)
 - Cuando el cashier hace checkout, le dice al carrito sumalizate y te devuelve el total (LISTO)
-- Hacer la parte de tarjeta de credito de alguna manera
--- Armar clase de interfaz que haga implementaciones simples de todo para responder. !
+-- Cashier tiene un registro de ventas
+- Hacer la parte de tarjeta de credito de alguna manera (LISTO)
+-- Armar clase de interfaz que haga implementaciones simples de todo para responder. 
+	--- Al hacerlo, asegurar que, por ejemplo, en el test con la tarjeta expirada NO se habló con el merchant processor (pensar cómo)!
 
 
 !CartTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 17:08'!
@@ -143,6 +145,46 @@ test11CashierCanCheckoutCartWithTwoDifferentItemsAndReturnsItsTotal
 	self assert: cashier totalSales equals: 13.
 	! !
 
+!CartTest methodsFor: 'tests' stamp: 'ft 11/18/2018 17:49:00'!
+test12CashierDoesntCheckoutCartWithExpiredCreditCard
+
+	| cart cashier creditCard |
+	
+	cart _ self createCart.
+	cashier _ self createCashier.
+	creditCard _ self createExpiredCreditCard.
+	
+	cart add: self itemSoldByTheStore.
+	cart add: self anotherItemSoldByTheStore.
+	
+	self 
+		should: [cashier checkout: cart with: creditCard]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: Cashier expiredCreditCardErrorMessage = anError messageText.
+			self assert: cashier totalSales equals: 0.]
+	! !
+
+!CartTest methodsFor: 'tests' stamp: 'ft 11/18/2018 18:07:42'!
+test13CashierRegistersDifferentSalesFromSameCreditCard
+
+	| cart1 cart2 cashier creditCard |
+	
+	cart1 _ self createCart.
+	cashier _ self createCashier.
+	creditCard _ self createCreditCard.
+	
+	cart1 add: self itemSoldByTheStore.
+	
+	cashier checkout: cart1 with: creditCard.
+	
+	cart2 _ self createCart.
+	cart2 add: self anotherItemSoldByTheStore.
+	
+	cashier checkout: cart2 with: creditCard.
+	
+	self assert: cashier totalSales equals: 13.! !
+
 
 !CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 16:52:40'!
 anotherItemSoldByTheStore
@@ -159,10 +201,15 @@ createCashier
 	
 	^Cashier new! !
 
-!CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 17:19:18'!
+!CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 17:54:10'!
 createCreditCard
 	
-	^CreditCard firstName: 'Diego' lastName: 'Maradona' number: 1234567890123456 expirationDate: (GregorianMonthOfYear novemberOf: 2022)! !
+	^CreditCard firstName: 'Diego' lastName: 'Maradona' number: 1234567890123456 expirationDate: (GregorianMonthOfYear yearNumber: 2022 monthNumber: 11)! !
+
+!CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 17:54:56'!
+createExpiredCreditCard
+	
+	^CreditCard firstName: 'Diego' lastName: 'Maradona' number: 1234567890123455 expirationDate: (GregorianMonthOfYear yearNumber: 2017 monthNumber: 11)! !
 
 !CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 17:26:58'!
 defaultCatalog
@@ -287,15 +334,16 @@ Object subclass: #Cashier
 	poolDictionaries: ''
 	category: 'Iteracion2'!
 
-!Cashier methodsFor: 'operations' stamp: 'ft 11/18/2018 17:16:19'!
+!Cashier methodsFor: 'operations' stamp: 'ft 11/18/2018 17:58:00'!
 checkout: aCart with: aCreditCard
 
 	| total |
 
 	aCart isEmpty ifTrue: [ ^ self error: self class emptyCartErrorMessage ].
-	
+	(aCreditCard hasExpired: GregorianMonthOfYear current) ifTrue: [ ^self error: self class expiredCreditCardErrorMessage].
+		
 	total := aCart totalPrice.
-	salesRegister add: (Association key: aCreditCard value: total).
+	self addSale: aCreditCard value: total.
 	
 	^ total! !
 
@@ -306,19 +354,20 @@ initialize
 	salesRegister := Dictionary new! !
 
 
-!Cashier methodsFor: 'accessing' stamp: 'ft 11/18/2018 17:04:49'!
-getSales: aCreditCard
-
-	(salesRegister includesKey: aCreditCard) ifFalse: [^self error: self class creditCardNotRegisteredErrorMessage].
-
-	^salesRegister at: aCreditCard! !
-
 !Cashier methodsFor: 'accessing' stamp: 'ft 11/18/2018 17:08:23'!
 totalSales
 
 	^salesRegister values
 		inject: 0
 		into: [ :total :aSale | total + aSale]! !
+
+
+!Cashier methodsFor: 'operations - private' stamp: 'ft 11/18/2018 18:04:41'!
+addSale: aCreditCard value: aNumber
+
+	salesRegister at: aCreditCard 
+		ifPresent: [ :value | salesRegister at: aCreditCard put: (value + aNumber)]
+		ifAbsent: [ salesRegister at: aCreditCard put: aNumber].! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -334,6 +383,11 @@ creditCardNotRegisteredErrorMessage
 !Cashier class methodsFor: 'error messages' stamp: 'LTO 11/15/2018 18:48:28'!
 emptyCartErrorMessage
 	^ 'Cannot checkout empty cart'! !
+
+!Cashier class methodsFor: 'error messages' stamp: 'ft 11/18/2018 17:50:57'!
+expiredCreditCardErrorMessage
+
+	^'The supplied credit card has expired'! !
 
 !Cashier class methodsFor: 'error messages' stamp: 'LTO 11/15/2018 19:38:07'!
 itemWithoutPriceErrorMessage
