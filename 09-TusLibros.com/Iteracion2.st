@@ -99,13 +99,14 @@ test08CartRemembersTheNumberOfAddedItems
 	cart add: 2 of: self itemSoldByTheStore.
 	self assert: (cart occurrencesOf: self itemSoldByTheStore) = 2! !
 
-!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 15:38:28'!
+!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 21:40:07'!
 test09CashierCantCheckoutEmptyCart
 
-	| cart cashier creditCard |
+	| cart cashier creditCard merchantProcessor |
 	
 	cart := self createCart.
-	cashier := self createCashier.
+	merchantProcessor := self createMerchantProcessor.
+	cashier := self createCashierWith: merchantProcessor.
 	creditCard := self createCreditCard.
 	
 	self
@@ -130,13 +131,14 @@ test10CashierCanCheckoutCartWithOneItem
 	self assert: (cashier checkout: cart with: creditCard) equals: 10.
 	self assert: cashier totalSales equals: 10.! !
 
-!CartTest methodsFor: 'tests' stamp: 'ft 11/18/2018 17:29:29'!
+!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 21:29:14'!
 test11CashierCanCheckoutCartWithTwoDifferentItemsAndReturnsItsTotal
 
-	| cart cashier creditCard |
+	| cart cashier creditCard merchantProcessor |
 	
 	cart _ self createCart.
-	cashier _ self createCashier.
+	merchantProcessor _ self createMerchantProcessor.
+	cashier _ self createCashierWith: merchantProcessor.
 	creditCard _ self createCreditCard.
 	
 	cart add: self itemSoldByTheStore.
@@ -146,13 +148,14 @@ test11CashierCanCheckoutCartWithTwoDifferentItemsAndReturnsItsTotal
 	self assert: cashier totalSales equals: 13.
 	! !
 
-!CartTest methodsFor: 'tests' stamp: 'ft 11/18/2018 17:49:00'!
+!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 21:29:44'!
 test12CashierDoesntCheckoutCartWithExpiredCreditCard
 
-	| cart cashier creditCard |
+	| cart cashier creditCard merchantProcessor |
 	
 	cart _ self createCart.
-	cashier _ self createCashier.
+	merchantProcessor _ self createMerchantProcessor.
+	cashier _ self createCashierWith: merchantProcessor.
 	creditCard _ self createExpiredCreditCard.
 	
 	cart add: self itemSoldByTheStore.
@@ -166,13 +169,14 @@ test12CashierDoesntCheckoutCartWithExpiredCreditCard
 			self assert: cashier totalSales equals: 0.]
 	! !
 
-!CartTest methodsFor: 'tests' stamp: 'ft 11/18/2018 18:07:42'!
+!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 21:32:57'!
 test13CashierRegistersDifferentSalesFromSameCreditCard
 
-	| cart1 cart2 cashier creditCard |
+	| cart1 cart2 cashier creditCard merchantProcessor |
 	
 	cart1 _ self createCart.
-	cashier _ self createCashier.
+	merchantProcessor _ self createMerchantProcessor.
+	cashier _ self createCashierWith: merchantProcessor.
 	creditCard _ self createCreditCard.
 	
 	cart1 add: self itemSoldByTheStore.
@@ -205,6 +209,44 @@ test14CashierCantSellToCreditCardWithoutFunds
 			self assert: MerchantProcessorInterface creditCardWithoutEnoughFundsErrorMessage = anError messageText.
 			self assert: cashier totalSales equals: 0]! !
 
+!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 23:39:21'!
+test15MerchantProcessorDoesntAcceptCreditCardWithLongName
+
+	| cart cashier creditCard merchantProcessor |
+	
+	cart _ self createCart.
+	merchantProcessor _ self createMerchantProcessor.
+	creditCard _ self createCreditCardWithLongName.
+	cashier _ self createCashierWith: merchantProcessor.
+	
+	cart add: self itemSoldByTheStore.
+	
+	self
+		should: [cashier checkout: cart with: creditCard]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: MerchantProcessorInterface creditCardNameIsTooLongErrorMessage = anError messageText.
+			self assert: cashier totalSales equals: 0]! !
+
+!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 23:39:58'!
+test16CashierCantSellToCreditCardThatIsNotInMerchantProcessorDatabase
+
+	| cart cashier creditCard merchantProcessor |
+	
+	cart _ self createCart.
+	merchantProcessor _ self createMerchantProcessor.
+	creditCard _ CreditCard name: 'Humberto Velez' number: 1234567890123452 expirationDate: (GregorianMonthOfYear yearNumber: 2022 monthNumber: 11).
+	cashier _ self createCashierWith: merchantProcessor.
+	
+	cart add: self itemSoldByTheStore.
+	
+	self
+		should: [cashier checkout: cart with: creditCard]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: MerchantProcessorInterface creditCardIsNotInTheDatabaseErrorMessage = anError messageText.
+			self assert: cashier totalSales equals: 0]! !
+
 
 !CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 16:52:40'!
 anotherItemSoldByTheStore
@@ -216,25 +258,25 @@ createCart
 	
 	^Cart acceptingItemsOf: self defaultCatalog! !
 
-!CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 16:55:19'!
-createCashier
-	
-	^Cashier new! !
-
 !CartTest methodsFor: 'support' stamp: 'ft 11/19/2018 15:57:11'!
 createCashierWith: aMerchantProcessor
 	
 	^Cashier with: aMerchantProcessor! !
 
-!CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 17:54:10'!
+!CartTest methodsFor: 'support' stamp: 'ft 11/19/2018 22:19:04'!
 createCreditCard
 	
-	^CreditCard firstName: 'Diego' lastName: 'Maradona' number: 1234567890123456 expirationDate: (GregorianMonthOfYear yearNumber: 2022 monthNumber: 11)! !
+	^CreditCard name: 'Diego Maradona' number: 1234567890123456 expirationDate: (GregorianMonthOfYear yearNumber: 2022 monthNumber: 11)! !
 
-!CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 17:54:56'!
+!CartTest methodsFor: 'support' stamp: 'ft 11/19/2018 22:19:16'!
+createCreditCardWithLongName
+	
+	^CreditCard name: 'Humberto Ottovordemgentschenfelde' number: 1234567890123454 expirationDate: (GregorianMonthOfYear yearNumber: 2022 monthNumber: 11)! !
+
+!CartTest methodsFor: 'support' stamp: 'ft 11/19/2018 22:19:25'!
 createExpiredCreditCard
 	
-	^CreditCard firstName: 'Diego' lastName: 'Maradona' number: 1234567890123455 expirationDate: (GregorianMonthOfYear yearNumber: 2017 monthNumber: 11)! !
+	^CreditCard name: 'Diego Maradona' number: 1234567890123455 expirationDate: (GregorianMonthOfYear yearNumber: 2017 monthNumber: 11)! !
 
 !CartTest methodsFor: 'support' stamp: 'ft 11/19/2018 15:57:50'!
 createMerchantProcessor
@@ -419,11 +461,6 @@ addSale: aCreditCard value: aNumber
 Cashier class
 	instanceVariableNames: ''!
 
-!Cashier class methodsFor: 'error messages' stamp: 'ft 11/18/2018 17:06:30'!
-creditCardNotRegisteredErrorMessage
-
-	^'The requested credit card has not made any buys yet'! !
-
 !Cashier class methodsFor: 'error messages' stamp: 'LTO 11/15/2018 18:48:28'!
 emptyCartErrorMessage
 	^ 'Cannot checkout empty cart'! !
@@ -432,10 +469,6 @@ emptyCartErrorMessage
 expiredCreditCardErrorMessage
 
 	^'The supplied credit card has expired'! !
-
-!Cashier class methodsFor: 'error messages' stamp: 'LTO 11/15/2018 19:38:07'!
-itemWithoutPriceErrorMessage
-	^ 'Cart contains an item thats not in the price list'! !
 
 
 !Cashier class methodsFor: 'class initialization' stamp: 'ft 11/19/2018 15:59:50'!
@@ -446,16 +479,15 @@ with: aMerchantProcessor
 
 !classDefinition: #CreditCard category: #Iteracion2!
 Object subclass: #CreditCard
-	instanceVariableNames: 'number firstName lastName expirationDate'
+	instanceVariableNames: 'number name expirationDate'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Iteracion2'!
 
-!CreditCard methodsFor: 'initialization' stamp: 'ft 11/18/2018 17:26:07'!
-initializeFirstName: aFirstName lastName: aSurname number: aNumber expirationDate: aMonthOfYear
+!CreditCard methodsFor: 'initialization' stamp: 'ft 11/19/2018 22:17:49'!
+initializeName: aName number: aNumber expirationDate: aMonthOfYear
 
-	firstName := aFirstName.
-	lastName := aSurname.
+	name := aName.
 	number := aNumber.
 	expirationDate := aMonthOfYear! !
 
@@ -466,11 +498,13 @@ hasExpired: fromMonthOfYear
 	^expirationDate < fromMonthOfYear! !
 
 
-!CreditCard methodsFor: 'comparing' stamp: 'ft 11/19/2018 16:46:02'!
+!CreditCard methodsFor: 'comparing' stamp: 'ft 11/19/2018 22:20:43'!
 = anObject
 
 	^self class = anObject class
-		and: [ number = anObject number ].! !
+		and: [number = anObject number 
+		and: [name = anObject name
+		and: [expirationDate = anObject expirationDate]]]! !
 
 
 !CreditCard methodsFor: 'accessing' stamp: 'ft 11/19/2018 16:34:24'!
@@ -478,15 +512,15 @@ expirationDate
 
 	^expirationDate! !
 
-!CreditCard methodsFor: 'accessing' stamp: 'ft 11/19/2018 16:34:09'!
-firstName
+!CreditCard methodsFor: 'accessing' stamp: 'ft 11/19/2018 23:35:18'!
+hash
 
-	^firstName! !
+	^number hash! !
 
-!CreditCard methodsFor: 'accessing' stamp: 'ft 11/19/2018 16:34:16'!
-lastName
+!CreditCard methodsFor: 'accessing' stamp: 'ft 11/19/2018 22:17:22'!
+name
 
-	^lastName! !
+	^name! !
 
 !CreditCard methodsFor: 'accessing' stamp: 'ft 11/19/2018 16:34:32'!
 number
@@ -499,12 +533,12 @@ number
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'class initialization' stamp: 'ft 11/18/2018 17:26:15'!
-firstName: aName lastName: aSurname number: aNumber expirationDate: aMonthOfYear
+!CreditCard class methodsFor: 'class initialization' stamp: 'ft 11/19/2018 22:18:08'!
+name: aName number: aNumber expirationDate: aMonthOfYear
 
 	aNumber printString size ~= 16 ifTrue: [^self error: self wrongAmountOfDigitsErrorMessage].
 	
-	^self new initializeFirstName: aName lastName: aSurname number: aNumber expirationDate: aMonthOfYear! !
+	^self new initializeName: aName number: aNumber expirationDate: aMonthOfYear! !
 
 
 !CreditCard class methodsFor: 'error messages' stamp: 'ft 11/18/2018 17:24:37'!
@@ -530,6 +564,16 @@ debit: anAmount from: aCreditCard
 !classDefinition: 'MerchantProcessorInterface class' category: #Iteracion2!
 MerchantProcessorInterface class
 	instanceVariableNames: ''!
+
+!MerchantProcessorInterface class methodsFor: 'error messages' stamp: 'ft 11/19/2018 23:40:38'!
+creditCardIsNotInTheDatabaseErrorMessage
+
+	^'The provided credit card was not found in the database'! !
+
+!MerchantProcessorInterface class methodsFor: 'error messages' stamp: 'ft 11/19/2018 22:16:05'!
+creditCardNameIsTooLongErrorMessage
+
+	^'The name in the credit card is too long'! !
 
 !MerchantProcessorInterface class methodsFor: 'error messages' stamp: 'ft 11/19/2018 16:08:05'!
 creditCardWithoutEnoughFundsErrorMessage
@@ -558,10 +602,13 @@ initializeWith: aDictionaryOfCreditCards
 	creditCardsDatabase := aDictionaryOfCreditCards ! !
 
 
-!MerchantProcessorMock methodsFor: 'operations' stamp: 'ft 11/19/2018 16:15:28'!
+!MerchantProcessorMock methodsFor: 'operations' stamp: 'ft 11/19/2018 23:44:05'!
 debit: anAmount from: aCreditCard
 
 	| funds |
+
+	aCreditCard name size > 30 ifTrue: [^self error: MerchantProcessorInterface creditCardNameIsTooLongErrorMessage].
+	(creditCardsDatabase includesKey: aCreditCard) ifFalse: [^self error: MerchantProcessorInterface creditCardIsNotInTheDatabaseErrorMessage].
 
 	funds _ creditCardsDatabase at: aCreditCard.
 
