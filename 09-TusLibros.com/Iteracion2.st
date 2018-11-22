@@ -194,8 +194,8 @@ test13CashierRegistersDifferentSalesFromSameCreditCard
 	self assert: cashier totalSales equals: 13.
 	self assert: merchantProcessor totalRequests equals: 2! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/21/2018 21:00:45'!
-test14MerchantProcessorDoesntAcceptCreditCardWithLongName
+!CartTest methodsFor: 'tests' stamp: 'ft 11/22/2018 09:33:38'!
+test14CashierCantSellToCreditCardWithLongName
 
 	| cart cashier creditCard merchantProcessor |
 	
@@ -233,6 +233,24 @@ test15CashierCantSellToCreditCardThatIsNotInMerchantProcessorDatabase
 			self assert: MerchantProcessorInterface creditCardIsNotInTheDatabaseErrorMessage = anError messageText.
 			self assert: cashier totalSales equals: 0.
 			self assert: merchantProcessor totalRequests equals: 0]! !
+
+!CartTest methodsFor: 'tests' stamp: 'ft 11/22/2018 09:35:04'!
+test16CanNotCreateCreditCardWithInvalidNumber
+
+	self
+		should: [CreditCard name: 'Humberto Velez' number: 123456789 expirationDate: (GregorianMonthOfYear yearNumber: 2022 monthNumber: 11)]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: CreditCard wrongAmountOfDigitsErrorMessage = anError messageText]! !
+
+!CartTest methodsFor: 'tests' stamp: 'ft 11/22/2018 09:35:46'!
+test17CanNotCreateCreditCardWithEmptyName
+
+	self
+		should: [CreditCard name: '' number: 1234567890123456 expirationDate: (GregorianMonthOfYear yearNumber: 2022 monthNumber: 11)]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: CreditCard invalidNameErrorMessage = anError messageText]! !
 
 
 !CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 16:52:40'!
@@ -275,10 +293,10 @@ defaultCatalog
 	
 	^Dictionary newFromPairs: (Array with: self itemSoldByTheStore with: 10 with: self anotherItemSoldByTheStore with: 3)! !
 
-!CartTest methodsFor: 'support' stamp: 'ft 11/19/2018 16:35:06'!
+!CartTest methodsFor: 'support' stamp: 'ft 11/22/2018 09:39:38'!
 defaultCreditCards
 	
-	^Dictionary newFromPairs: (Array with: self createCreditCard with: 100 with: self createExpiredCreditCard with: 100)! !
+	^Array with: self createCreditCard with: self createExpiredCreditCard! !
 
 !CartTest methodsFor: 'support' stamp: 'LTO 11/15/2018 19:34:49'!
 itemNotSoldByTheStore
@@ -520,18 +538,36 @@ number
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'class initialization' stamp: 'ft 11/19/2018 22:18:08'!
+!CreditCard class methodsFor: 'class initialization' stamp: 'ft 11/22/2018 09:38:27'!
 name: aName number: aNumber expirationDate: aMonthOfYear
 
-	aNumber printString size ~= 16 ifTrue: [^self error: self wrongAmountOfDigitsErrorMessage].
+	self assertValidNumber: aNumber.
+	self assertValidName: aName.
 	
 	^self new initializeName: aName number: aNumber expirationDate: aMonthOfYear! !
 
+
+!CreditCard class methodsFor: 'error messages' stamp: 'ft 11/22/2018 09:36:23'!
+invalidNameErrorMessage
+
+	^'The name can not be empty'! !
 
 !CreditCard class methodsFor: 'error messages' stamp: 'ft 11/18/2018 17:24:37'!
 wrongAmountOfDigitsErrorMessage
 
 	^'There must be 16 digits for a credit card number to be valid'! !
+
+
+!CreditCard class methodsFor: 'assertions' stamp: 'ft 11/22/2018 09:38:08'!
+assertValidName: aName
+
+	aName isEmpty ifTrue: [^self error: self invalidNameErrorMessage].
+! !
+
+!CreditCard class methodsFor: 'assertions' stamp: 'ft 11/22/2018 09:37:55'!
+assertValidNumber: aNumber
+
+	aNumber printString size ~= 16 ifTrue: [^self error: self wrongAmountOfDigitsErrorMessage]! !
 
 
 !classDefinition: #MerchantProcessorInterface category: #Iteracion2!
@@ -583,18 +619,19 @@ MerchantProcessorInterface subclass: #MerchantProcessorMock
 	poolDictionaries: ''
 	category: 'Iteracion2'!
 
-!MerchantProcessorMock methodsFor: 'initialization' stamp: 'LTO 11/21/2018 20:57:09'!
-initializeWith: aDictionaryOfCreditCards
+!MerchantProcessorMock methodsFor: 'initialization' stamp: 'ft 11/22/2018 09:39:11'!
+initializeWith: aCollectionOfCreditCards
 
-	creditCardsDatabase := aDictionaryOfCreditCards.
+	creditCardsDatabase := aCollectionOfCreditCards.
 	mpRequestsCount := 0! !
 
 
-!MerchantProcessorMock methodsFor: 'operations' stamp: 'LTO 11/21/2018 20:57:19'!
+!MerchantProcessorMock methodsFor: 'operations' stamp: 'ft 11/22/2018 09:42:34'!
 debit: anAmount from: aCreditCard
 
-	aCreditCard name size > 30 ifTrue: [^self error: MerchantProcessorInterface creditCardNameIsTooLongErrorMessage].
-	(creditCardsDatabase includesKey: aCreditCard) ifFalse: [^self error: MerchantProcessorInterface creditCardIsNotInTheDatabaseErrorMessage].
+	self assertValidName: aCreditCard name.
+	self assertCreditCardIsInDatabase: aCreditCard.
+
 	mpRequestsCount := mpRequestsCount + 1! !
 
 !MerchantProcessorMock methodsFor: 'operations' stamp: 'LTO 11/21/2018 20:59:37'!
@@ -602,15 +639,26 @@ totalRequests
 
 	^ mpRequestsCount! !
 
+
+!MerchantProcessorMock methodsFor: 'assertions' stamp: 'ft 11/22/2018 09:42:04'!
+assertCreditCardIsInDatabase: aCreditCard
+
+	(creditCardsDatabase includes: aCreditCard) ifFalse: [^self error: MerchantProcessorInterface creditCardIsNotInTheDatabaseErrorMessage].! !
+
+!MerchantProcessorMock methodsFor: 'assertions' stamp: 'ft 11/22/2018 09:41:34'!
+assertValidName: aName
+
+	aName size > 30 ifTrue: [^self error: MerchantProcessorInterface creditCardNameIsTooLongErrorMessage]! !
+
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
 !classDefinition: 'MerchantProcessorMock class' category: #Iteracion2!
 MerchantProcessorMock class
 	instanceVariableNames: ''!
 
-!MerchantProcessorMock class methodsFor: 'class initialization' stamp: 'ft 11/19/2018 15:49:39'!
-with: aDictionaryOfCreditCards
+!MerchantProcessorMock class methodsFor: 'class initialization' stamp: 'ft 11/22/2018 09:38:55'!
+with: aCollectionOfCreditCards
 
-	^self new initializeWith: aDictionaryOfCreditCards 
+	^self new initializeWith: aCollectionOfCreditCards 
 
 ! !
