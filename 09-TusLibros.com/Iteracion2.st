@@ -1,24 +1,19 @@
-!classDefinition: #CartTest category: #Iteracion2!
-TestCase subclass: #CartTest
+!classDefinition: #CartAndCashierTest category: #Iteracion2!
+TestCase subclass: #CartAndCashierTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Iteracion2'!
-!CartTest commentStamp: '<historical>' prior: 0!
-- Hacer que catalogo sea la lista de precios (LISTO)
-- Cuando el cashier hace checkout, le dice al carrito sumalizate y te devuelve el total (LISTO)
--- Cashier tiene un registro de ventas
-- Hacer la parte de tarjeta de credito de alguna manera (LISTO)
--- Armar clase de interfaz que haga implementaciones simples de todo para responder. 
-	--- Al hacerlo, asegurar que, por ejemplo, en el test con la tarjeta expirada NO se habló con el merchant processor (pensar cómo)!
+!CartAndCashierTest commentStamp: '<historical>' prior: 0!
+(Comment)!
 
 
-!CartTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 17:08'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'HernanWilkinson 6/17/2013 17:08'!
 test01NewCartsAreCreatedEmpty
 
 	self assert: self createCart isEmpty! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:49'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:49'!
 test02CanNotAddItemsThatDoNotBelongToStore
 
 	| cart |
@@ -32,7 +27,7 @@ test02CanNotAddItemsThatDoNotBelongToStore
 			self assert: anError messageText = cart invalidItemErrorMessage.
 			self assert: cart isEmpty ]! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:28'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:28'!
 test03AfterAddingAnItemTheCartIsNotEmptyAnymore
 
 	| cart |
@@ -42,7 +37,7 @@ test03AfterAddingAnItemTheCartIsNotEmptyAnymore
 	cart add: self itemSoldByTheStore.
 	self deny: cart isEmpty ! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:28'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:28'!
 test04CanNotAddNonPositiveNumberOfItems
 
 	| cart |
@@ -56,7 +51,7 @@ test04CanNotAddNonPositiveNumberOfItems
 			self assert: anError messageText = cart invalidQuantityErrorMessage.
 			self assert: cart isEmpty ]! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:49'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:49'!
 test05CanNotAddMoreThanOneItemNotSellByTheStore
 
 	| cart |
@@ -70,7 +65,7 @@ test05CanNotAddMoreThanOneItemNotSellByTheStore
 			self assert: anError messageText = cart invalidItemErrorMessage.
 			self assert: cart isEmpty ]! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:28'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:28'!
 test06CartRemembersAddedItems
 
 	| cart |
@@ -80,7 +75,7 @@ test06CartRemembersAddedItems
 	cart add: self itemSoldByTheStore.
 	self assert: (cart includes: self itemSoldByTheStore)! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:28'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:28'!
 test07CartDoesNotHoldNotAddedItems
 
 	| cart |
@@ -89,7 +84,7 @@ test07CartDoesNotHoldNotAddedItems
 	
 	self deny: (cart includes: self itemSoldByTheStore)! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:28'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'LTO 11/15/2018 19:34:28'!
 test08CartRemembersTheNumberOfAddedItems
 
 	| cart |
@@ -99,7 +94,7 @@ test08CartRemembersTheNumberOfAddedItems
 	cart add: 2 of: self itemSoldByTheStore.
 	self assert: (cart occurrencesOf: self itemSoldByTheStore) = 2! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/21/2018 20:59:14'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'ft 11/22/2018 14:17:13'!
 test09CashierCantCheckoutEmptyCart
 
 	| cart cashier creditCard merchantProcessor |
@@ -115,9 +110,9 @@ test09CashierCantCheckoutEmptyCart
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Cashier emptyCartErrorMessage.
 			self assert: cashier totalSales equals: 0.
-			self assert: merchantProcessor totalRequests equals: 0]! !
+			self assert: cashier totalRequestsToMerchantProcessor equals: 0]! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/21/2018 21:00:02'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'ft 11/22/2018 14:17:13'!
 test10CashierCanCheckoutCartWithOneItem
 
 	| cart cashier creditCard merchantProcessor |
@@ -131,9 +126,9 @@ test10CashierCanCheckoutCartWithOneItem
 	
 	self assert: (cashier checkout: cart with: creditCard) equals: 10.
 	self assert: cashier totalSales equals: 10.
-	self assert: merchantProcessor totalRequests equals: 1! !
+	self assert: cashier totalRequestsToMerchantProcessor equals: 1! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/21/2018 21:00:15'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'ft 11/22/2018 14:17:33'!
 test11CashierCanCheckoutCartWithTwoDifferentItemsAndReturnsItsTotal
 
 	| cart cashier creditCard merchantProcessor |
@@ -148,9 +143,9 @@ test11CashierCanCheckoutCartWithTwoDifferentItemsAndReturnsItsTotal
 	
 	self assert: (cashier checkout: cart with: creditCard) equals: 13.
 	self assert: cashier totalSales equals: 13.
-	self assert: merchantProcessor totalRequests equals: 1! !
+	self assert: cashier totalRequestsToMerchantProcessor equals: 1! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/21/2018 21:00:29'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'ft 11/22/2018 14:17:42'!
 test12CashierDoesntCheckoutCartWithExpiredCreditCard
 
 	| cart cashier creditCard merchantProcessor |
@@ -169,10 +164,10 @@ test12CashierDoesntCheckoutCartWithExpiredCreditCard
 		withExceptionDo: [ :anError |
 			self assert: Cashier expiredCreditCardErrorMessage = anError messageText.
 			self assert: cashier totalSales equals: 0.
-			self assert: merchantProcessor totalRequests equals: 0]
+			self assert: cashier totalRequestsToMerchantProcessor equals: 0]
 	! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/21/2018 21:00:38'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'ft 11/22/2018 14:17:52'!
 test13CashierRegistersDifferentSalesFromSameCreditCard
 
 	| cart1 cart2 cashier creditCard merchantProcessor |
@@ -192,9 +187,9 @@ test13CashierRegistersDifferentSalesFromSameCreditCard
 	cashier checkout: cart2 with: creditCard.
 	
 	self assert: cashier totalSales equals: 13.
-	self assert: merchantProcessor totalRequests equals: 2! !
+	self assert: cashier totalRequestsToMerchantProcessor equals: 2! !
 
-!CartTest methodsFor: 'tests' stamp: 'ft 11/22/2018 09:33:38'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'ft 11/22/2018 14:18:11'!
 test14CashierCantSellToCreditCardWithLongName
 
 	| cart cashier creditCard merchantProcessor |
@@ -212,9 +207,9 @@ test14CashierCantSellToCreditCardWithLongName
 		withExceptionDo: [ :anError |
 			self assert: MerchantProcessorInterface creditCardNameIsTooLongErrorMessage = anError messageText.
 			self assert: cashier totalSales equals: 0.
-			self assert: merchantProcessor totalRequests equals: 0]! !
+			self assert: cashier totalRequestsToMerchantProcessor equals: 1]! !
 
-!CartTest methodsFor: 'tests' stamp: 'LTO 11/21/2018 21:00:50'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'ft 11/22/2018 14:18:23'!
 test15CashierCantSellToCreditCardThatIsNotInMerchantProcessorDatabase
 
 	| cart cashier creditCard merchantProcessor |
@@ -232,9 +227,9 @@ test15CashierCantSellToCreditCardThatIsNotInMerchantProcessorDatabase
 		withExceptionDo: [ :anError |
 			self assert: MerchantProcessorInterface creditCardIsNotInTheDatabaseErrorMessage = anError messageText.
 			self assert: cashier totalSales equals: 0.
-			self assert: merchantProcessor totalRequests equals: 0]! !
+			self assert: cashier totalRequestsToMerchantProcessor equals: 1]! !
 
-!CartTest methodsFor: 'tests' stamp: 'ft 11/22/2018 09:35:04'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'ft 11/22/2018 09:35:04'!
 test16CanNotCreateCreditCardWithInvalidNumber
 
 	self
@@ -243,7 +238,7 @@ test16CanNotCreateCreditCardWithInvalidNumber
 		withExceptionDo: [ :anError |
 			self assert: CreditCard wrongAmountOfDigitsErrorMessage = anError messageText]! !
 
-!CartTest methodsFor: 'tests' stamp: 'ft 11/22/2018 09:35:46'!
+!CartAndCashierTest methodsFor: 'tests' stamp: 'ft 11/22/2018 09:35:46'!
 test17CanNotCreateCreditCardWithEmptyName
 
 	self
@@ -252,58 +247,67 @@ test17CanNotCreateCreditCardWithEmptyName
 		withExceptionDo: [ :anError |
 			self assert: CreditCard invalidNameErrorMessage = anError messageText]! !
 
+!CartAndCashierTest methodsFor: 'tests' stamp: 'ft 11/22/2018 13:58:30'!
+test18CanNotCreateCreditCardWithInvalidDate
 
-!CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 16:52:40'!
+	self
+		should: [CreditCard name: 'Humberto Velez' number: 1234567890123456 expirationDate: (GregorianMonth november)]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: CreditCard invalidDateErrorMessage = anError messageText]! !
+
+
+!CartAndCashierTest methodsFor: 'support' stamp: 'ft 11/18/2018 16:52:40'!
 anotherItemSoldByTheStore
 	
 	^ '12345'! !
 
-!CartTest methodsFor: 'support' stamp: 'HernanWilkinson 6/17/2013 17:48'!
+!CartAndCashierTest methodsFor: 'support' stamp: 'HernanWilkinson 6/17/2013 17:48'!
 createCart
 	
 	^Cart acceptingItemsOf: self defaultCatalog! !
 
-!CartTest methodsFor: 'support' stamp: 'ft 11/19/2018 15:57:11'!
+!CartAndCashierTest methodsFor: 'support' stamp: 'ft 11/19/2018 15:57:11'!
 createCashierWith: aMerchantProcessor
 	
 	^Cashier with: aMerchantProcessor! !
 
-!CartTest methodsFor: 'support' stamp: 'ft 11/19/2018 22:19:04'!
+!CartAndCashierTest methodsFor: 'support' stamp: 'ft 11/19/2018 22:19:04'!
 createCreditCard
 	
 	^CreditCard name: 'Diego Maradona' number: 1234567890123456 expirationDate: (GregorianMonthOfYear yearNumber: 2022 monthNumber: 11)! !
 
-!CartTest methodsFor: 'support' stamp: 'ft 11/19/2018 22:19:16'!
+!CartAndCashierTest methodsFor: 'support' stamp: 'ft 11/19/2018 22:19:16'!
 createCreditCardWithLongName
 	
 	^CreditCard name: 'Humberto Ottovordemgentschenfelde' number: 1234567890123454 expirationDate: (GregorianMonthOfYear yearNumber: 2022 monthNumber: 11)! !
 
-!CartTest methodsFor: 'support' stamp: 'ft 11/19/2018 22:19:25'!
+!CartAndCashierTest methodsFor: 'support' stamp: 'ft 11/19/2018 22:19:25'!
 createExpiredCreditCard
 	
 	^CreditCard name: 'Diego Maradona' number: 1234567890123455 expirationDate: (GregorianMonthOfYear yearNumber: 2017 monthNumber: 11)! !
 
-!CartTest methodsFor: 'support' stamp: 'ft 11/19/2018 15:57:50'!
+!CartAndCashierTest methodsFor: 'support' stamp: 'ft 11/19/2018 15:57:50'!
 createMerchantProcessor
 	
 	^MerchantProcessorMock with: self defaultCreditCards! !
 
-!CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 17:26:58'!
+!CartAndCashierTest methodsFor: 'support' stamp: 'ft 11/18/2018 17:26:58'!
 defaultCatalog
 	
 	^Dictionary newFromPairs: (Array with: self itemSoldByTheStore with: 10 with: self anotherItemSoldByTheStore with: 3)! !
 
-!CartTest methodsFor: 'support' stamp: 'ft 11/22/2018 09:39:38'!
+!CartAndCashierTest methodsFor: 'support' stamp: 'ft 11/22/2018 09:39:38'!
 defaultCreditCards
 	
 	^Array with: self createCreditCard with: self createExpiredCreditCard! !
 
-!CartTest methodsFor: 'support' stamp: 'LTO 11/15/2018 19:34:49'!
+!CartAndCashierTest methodsFor: 'support' stamp: 'LTO 11/15/2018 19:34:49'!
 itemNotSoldByTheStore
 	
 	^'invalidBook'! !
 
-!CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 16:30:36'!
+!CartAndCashierTest methodsFor: 'support' stamp: 'ft 11/18/2018 16:30:36'!
 itemSoldByTheStore
 	
 	^'1234567'! !
@@ -411,12 +415,12 @@ emptyCartErrorMessage
 
 !classDefinition: #Cashier category: #Iteracion2!
 Object subclass: #Cashier
-	instanceVariableNames: 'salesRegister merchantProcessor'
+	instanceVariableNames: 'salesRegister merchantProcessor transactionsSent'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Iteracion2'!
 
-!Cashier methodsFor: 'operations' stamp: 'LTO 11/21/2018 20:57:31'!
+!Cashier methodsFor: 'operations' stamp: 'ft 11/22/2018 14:14:13'!
 checkout: aCart with: aCreditCard
 
 	| total |
@@ -426,6 +430,7 @@ checkout: aCart with: aCreditCard
 		
 	total := aCart totalPrice.
 	
+	self addTransactionSent: aCreditCard value: total.
 	merchantProcessor debit: total from: aCreditCard.
 	
 	self addSale: aCreditCard value: total.
@@ -433,17 +438,18 @@ checkout: aCart with: aCreditCard
 	^ total! !
 
 
-!Cashier methodsFor: 'initialization' stamp: 'ft 11/18/2018 17:02:58'!
-initialize
-
-	salesRegister := Dictionary new! !
-
-!Cashier methodsFor: 'initialization' stamp: 'LTO 11/21/2018 20:57:37'!
+!Cashier methodsFor: 'initialization' stamp: 'ft 11/22/2018 14:13:43'!
 initializeWith: aMerchantProcessor
 
 	salesRegister := Dictionary new.
-	merchantProcessor := aMerchantProcessor! !
+	merchantProcessor := aMerchantProcessor.
+	transactionsSent := OrderedCollection new.! !
 
+
+!Cashier methodsFor: 'accessing' stamp: 'ft 11/22/2018 14:17:12'!
+totalRequestsToMerchantProcessor
+
+	^transactionsSent size! !
 
 !Cashier methodsFor: 'accessing' stamp: 'ft 11/18/2018 17:08:23'!
 totalSales
@@ -459,6 +465,11 @@ addSale: aCreditCard value: aNumber
 	salesRegister at: aCreditCard 
 		ifPresent: [ :value | salesRegister at: aCreditCard put: (value + aNumber)]
 		ifAbsent: [ salesRegister at: aCreditCard put: aNumber].! !
+
+!Cashier methodsFor: 'operations - private' stamp: 'ft 11/22/2018 14:14:43'!
+addTransactionSent: aCreditCard value: aValue
+
+	transactionsSent add: (Association key: aCreditCard value: aValue)! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -538,14 +549,20 @@ number
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'class initialization' stamp: 'ft 11/22/2018 09:38:27'!
+!CreditCard class methodsFor: 'class initialization' stamp: 'ft 11/22/2018 14:00:05'!
 name: aName number: aNumber expirationDate: aMonthOfYear
 
 	self assertValidNumber: aNumber.
 	self assertValidName: aName.
+	self assertValidDate: aMonthOfYear.
 	
 	^self new initializeName: aName number: aNumber expirationDate: aMonthOfYear! !
 
+
+!CreditCard class methodsFor: 'error messages' stamp: 'ft 11/22/2018 14:01:30'!
+invalidDateErrorMessage
+
+	^'The expiration date supplied is not valid'! !
 
 !CreditCard class methodsFor: 'error messages' stamp: 'ft 11/22/2018 09:36:23'!
 invalidNameErrorMessage
@@ -557,6 +574,13 @@ wrongAmountOfDigitsErrorMessage
 
 	^'There must be 16 digits for a credit card number to be valid'! !
 
+
+!CreditCard class methodsFor: 'assertions' stamp: 'ft 11/22/2018 14:09:16'!
+assertValidDate: aMonthOfYear
+
+	[aMonthOfYear monthNumber > 0 and: [aMonthOfYear year number > 0]]
+	on: Error
+	do: [^self error: self invalidDateErrorMessage]! !
 
 !CreditCard class methodsFor: 'assertions' stamp: 'ft 11/22/2018 09:38:08'!
 assertValidName: aName
@@ -572,7 +596,7 @@ assertValidNumber: aNumber
 
 !classDefinition: #MerchantProcessorInterface category: #Iteracion2!
 Object subclass: #MerchantProcessorInterface
-	instanceVariableNames: 'creditCardsDatabase mpRequestsCount'
+	instanceVariableNames: 'creditCardsDatabase'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Iteracion2'!
@@ -626,18 +650,12 @@ initializeWith: aCollectionOfCreditCards
 	mpRequestsCount := 0! !
 
 
-!MerchantProcessorMock methodsFor: 'operations' stamp: 'ft 11/22/2018 09:42:34'!
+!MerchantProcessorMock methodsFor: 'operations' stamp: 'ft 11/22/2018 14:18:48'!
 debit: anAmount from: aCreditCard
 
 	self assertValidName: aCreditCard name.
 	self assertCreditCardIsInDatabase: aCreditCard.
-
-	mpRequestsCount := mpRequestsCount + 1! !
-
-!MerchantProcessorMock methodsFor: 'operations' stamp: 'LTO 11/21/2018 20:59:37'!
-totalRequests
-
-	^ mpRequestsCount! !
+! !
 
 
 !MerchantProcessorMock methodsFor: 'assertions' stamp: 'ft 11/22/2018 09:42:04'!
