@@ -99,7 +99,7 @@ test08CartRemembersTheNumberOfAddedItems
 	cart add: 2 of: self itemSoldByTheStore.
 	self assert: (cart occurrencesOf: self itemSoldByTheStore) = 2! !
 
-!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 21:40:07'!
+!CartTest methodsFor: 'tests' stamp: 'LTO 11/21/2018 20:59:14'!
 test09CashierCantCheckoutEmptyCart
 
 	| cart cashier creditCard merchantProcessor |
@@ -114,9 +114,10 @@ test09CashierCantCheckoutEmptyCart
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Cashier emptyCartErrorMessage.
-			self assert: cashier totalSales equals: 0]! !
+			self assert: cashier totalSales equals: 0.
+			self assert: merchantProcessor totalRequests equals: 0]! !
 
-!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 16:10:33'!
+!CartTest methodsFor: 'tests' stamp: 'LTO 11/21/2018 21:00:02'!
 test10CashierCanCheckoutCartWithOneItem
 
 	| cart cashier creditCard merchantProcessor |
@@ -129,9 +130,10 @@ test10CashierCanCheckoutCartWithOneItem
 	cart add: self itemSoldByTheStore.
 	
 	self assert: (cashier checkout: cart with: creditCard) equals: 10.
-	self assert: cashier totalSales equals: 10.! !
+	self assert: cashier totalSales equals: 10.
+	self assert: merchantProcessor totalRequests equals: 1! !
 
-!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 21:29:14'!
+!CartTest methodsFor: 'tests' stamp: 'LTO 11/21/2018 21:00:15'!
 test11CashierCanCheckoutCartWithTwoDifferentItemsAndReturnsItsTotal
 
 	| cart cashier creditCard merchantProcessor |
@@ -146,9 +148,9 @@ test11CashierCanCheckoutCartWithTwoDifferentItemsAndReturnsItsTotal
 	
 	self assert: (cashier checkout: cart with: creditCard) equals: 13.
 	self assert: cashier totalSales equals: 13.
-	! !
+	self assert: merchantProcessor totalRequests equals: 1! !
 
-!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 21:29:44'!
+!CartTest methodsFor: 'tests' stamp: 'LTO 11/21/2018 21:00:29'!
 test12CashierDoesntCheckoutCartWithExpiredCreditCard
 
 	| cart cashier creditCard merchantProcessor |
@@ -166,10 +168,11 @@ test12CashierDoesntCheckoutCartWithExpiredCreditCard
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: Cashier expiredCreditCardErrorMessage = anError messageText.
-			self assert: cashier totalSales equals: 0.]
+			self assert: cashier totalSales equals: 0.
+			self assert: merchantProcessor totalRequests equals: 0]
 	! !
 
-!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 21:32:57'!
+!CartTest methodsFor: 'tests' stamp: 'LTO 11/21/2018 21:00:38'!
 test13CashierRegistersDifferentSalesFromSameCreditCard
 
 	| cart1 cart2 cashier creditCard merchantProcessor |
@@ -188,29 +191,11 @@ test13CashierRegistersDifferentSalesFromSameCreditCard
 	
 	cashier checkout: cart2 with: creditCard.
 	
-	self assert: cashier totalSales equals: 13.! !
+	self assert: cashier totalSales equals: 13.
+	self assert: merchantProcessor totalRequests equals: 2! !
 
-!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 16:18:01'!
-test14CashierCantSellToCreditCardWithoutFunds
-
-	| cart cashier creditCard merchantProcessor |
-	
-	cart _ self createCart.
-	merchantProcessor _ self createMerchantProcessor.
-	creditCard _ self createCreditCard.
-	cashier _ self createCashierWith: merchantProcessor.
-	
-	cart add: 100 of: self itemSoldByTheStore.
-	
-	self
-		should: [cashier checkout: cart with: creditCard]
-		raise: Error
-		withExceptionDo: [ :anError |
-			self assert: MerchantProcessorInterface creditCardWithoutEnoughFundsErrorMessage = anError messageText.
-			self assert: cashier totalSales equals: 0]! !
-
-!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 23:39:21'!
-test15MerchantProcessorDoesntAcceptCreditCardWithLongName
+!CartTest methodsFor: 'tests' stamp: 'LTO 11/21/2018 21:00:45'!
+test14MerchantProcessorDoesntAcceptCreditCardWithLongName
 
 	| cart cashier creditCard merchantProcessor |
 	
@@ -226,10 +211,11 @@ test15MerchantProcessorDoesntAcceptCreditCardWithLongName
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: MerchantProcessorInterface creditCardNameIsTooLongErrorMessage = anError messageText.
-			self assert: cashier totalSales equals: 0]! !
+			self assert: cashier totalSales equals: 0.
+			self assert: merchantProcessor totalRequests equals: 0]! !
 
-!CartTest methodsFor: 'tests' stamp: 'ft 11/19/2018 23:39:58'!
-test16CashierCantSellToCreditCardThatIsNotInMerchantProcessorDatabase
+!CartTest methodsFor: 'tests' stamp: 'LTO 11/21/2018 21:00:50'!
+test15CashierCantSellToCreditCardThatIsNotInMerchantProcessorDatabase
 
 	| cart cashier creditCard merchantProcessor |
 	
@@ -245,7 +231,8 @@ test16CashierCantSellToCreditCardThatIsNotInMerchantProcessorDatabase
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: MerchantProcessorInterface creditCardIsNotInTheDatabaseErrorMessage = anError messageText.
-			self assert: cashier totalSales equals: 0]! !
+			self assert: cashier totalSales equals: 0.
+			self assert: merchantProcessor totalRequests equals: 0]! !
 
 
 !CartTest methodsFor: 'support' stamp: 'ft 11/18/2018 16:52:40'!
@@ -411,7 +398,7 @@ Object subclass: #Cashier
 	poolDictionaries: ''
 	category: 'Iteracion2'!
 
-!Cashier methodsFor: 'operations' stamp: 'ft 11/19/2018 16:07:07'!
+!Cashier methodsFor: 'operations' stamp: 'LTO 11/21/2018 20:57:31'!
 checkout: aCart with: aCreditCard
 
 	| total |
@@ -433,11 +420,11 @@ initialize
 
 	salesRegister := Dictionary new! !
 
-!Cashier methodsFor: 'initialization' stamp: 'ft 11/19/2018 16:00:13'!
+!Cashier methodsFor: 'initialization' stamp: 'LTO 11/21/2018 20:57:37'!
 initializeWith: aMerchantProcessor
 
 	salesRegister := Dictionary new.
-	merchantProcessor := aMerchantProcessor ! !
+	merchantProcessor := aMerchantProcessor! !
 
 
 !Cashier methodsFor: 'accessing' stamp: 'ft 11/18/2018 17:08:23'!
@@ -549,13 +536,18 @@ wrongAmountOfDigitsErrorMessage
 
 !classDefinition: #MerchantProcessorInterface category: #Iteracion2!
 Object subclass: #MerchantProcessorInterface
-	instanceVariableNames: 'creditCardsDatabase'
+	instanceVariableNames: 'creditCardsDatabase mpRequestsCount'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'Iteracion2'!
 
 !MerchantProcessorInterface methodsFor: 'operations' stamp: 'ft 11/19/2018 16:04:08'!
 debit: anAmount from: aCreditCard
+
+	self subclassResponsibility ! !
+
+!MerchantProcessorInterface methodsFor: 'operations' stamp: 'LTO 11/21/2018 20:59:37'!
+totalRequests
 
 	self subclassResponsibility ! !
 
@@ -575,11 +567,6 @@ creditCardNameIsTooLongErrorMessage
 
 	^'The name in the credit card is too long'! !
 
-!MerchantProcessorInterface class methodsFor: 'error messages' stamp: 'ft 11/19/2018 16:08:05'!
-creditCardWithoutEnoughFundsErrorMessage
-
-	^'The credit card doesnt have enough funds'! !
-
 
 !classDefinition: #MerchantProcessor category: #Iteracion2!
 MerchantProcessorInterface subclass: #MerchantProcessor
@@ -596,25 +583,24 @@ MerchantProcessorInterface subclass: #MerchantProcessorMock
 	poolDictionaries: ''
 	category: 'Iteracion2'!
 
-!MerchantProcessorMock methodsFor: 'initialization' stamp: 'ft 11/19/2018 15:50:07'!
+!MerchantProcessorMock methodsFor: 'initialization' stamp: 'LTO 11/21/2018 20:57:09'!
 initializeWith: aDictionaryOfCreditCards
 
-	creditCardsDatabase := aDictionaryOfCreditCards ! !
+	creditCardsDatabase := aDictionaryOfCreditCards.
+	mpRequestsCount := 0! !
 
 
-!MerchantProcessorMock methodsFor: 'operations' stamp: 'ft 11/19/2018 23:44:05'!
+!MerchantProcessorMock methodsFor: 'operations' stamp: 'LTO 11/21/2018 20:57:19'!
 debit: anAmount from: aCreditCard
-
-	| funds |
 
 	aCreditCard name size > 30 ifTrue: [^self error: MerchantProcessorInterface creditCardNameIsTooLongErrorMessage].
 	(creditCardsDatabase includesKey: aCreditCard) ifFalse: [^self error: MerchantProcessorInterface creditCardIsNotInTheDatabaseErrorMessage].
+	mpRequestsCount := mpRequestsCount + 1! !
 
-	funds _ creditCardsDatabase at: aCreditCard.
+!MerchantProcessorMock methodsFor: 'operations' stamp: 'LTO 11/21/2018 20:59:37'!
+totalRequests
 
-	funds < anAmount ifTrue: [^self error: MerchantProcessorInterface creditCardWithoutEnoughFundsErrorMessage].
-	
-	^creditCardsDatabase at: aCreditCard put: funds - anAmount! !
+	^ mpRequestsCount! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
