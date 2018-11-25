@@ -246,24 +246,112 @@ debit: anAmount from: aCreditCard
 	^debitBehavior value: anAmount value: aCreditCard ! !
 
 
-!classDefinition: #RestInterfaceTest category: #TusLibros!
-TestCase subclass: #RestInterfaceTest
-	instanceVariableNames: ''
+!classDefinition: #StoreRestInterfaceTest category: #TusLibros!
+TestCase subclass: #StoreRestInterfaceTest
+	instanceVariableNames: 'testObjectsFactory'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
 
-!RestInterfaceTest methodsFor: 'testing' stamp: 'ft 11/22/2018 20:10:54'!
+!StoreRestInterfaceTest methodsFor: 'testing' stamp: 'ft 11/25/2018 18:17:15'!
 test01CartIsNotCreatedForInvalidClientAndPassword
 
 	"RestInterface solo responde a esos 5 mensajes. No puedo acceder al modelo, por lo que solamente puedo interactuar a través de esos 5 mensajes."
+	
+	| storeRestInterface |
+	
+	storeRestInterface := testObjectsFactory createInterface.
+	
+	self
+		should: [storeRestInterface
+							createCartForClient: testObjectsFactory invalidClient
+							withPassword: testObjectsFactory invalidPassword]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = StoreRestInterface invalidClientErrorMessage]! !
 
-	"RestInterface debe lanzar excepcion en este caso"! !
-
-!RestInterfaceTest methodsFor: 'testing' stamp: 'ft 11/22/2018 20:09:35'!
+!StoreRestInterfaceTest methodsFor: 'testing' stamp: 'ft 11/25/2018 18:17:23'!
 test02CartIsCreatedCorrectlyForValidClientAndPassword
+	
+	| storeRestInterface cartID |
+	
+	storeRestInterface := testObjectsFactory createInterface.
+	cartID := testObjectsFactory createCartForInterface: storeRestInterface.
+	
+	self assert: (storeRestInterface listCart: cartID) isEmpty
+	! !
 
-	"Llamar listCart sobre el ID devuelto para ver que se creó correctamente"! !
+!StoreRestInterfaceTest methodsFor: 'testing' stamp: 'ft 11/25/2018 18:32:05'!
+test03CanAddItemToCart
+	
+	| storeRestInterface cartID items itemSoldByTheStore |
+	
+	storeRestInterface := testObjectsFactory createInterface.
+	cartID := testObjectsFactory createCartForInterface: storeRestInterface.
+	itemSoldByTheStore := testObjectsFactory itemSellByTheStore.
+	
+	storeRestInterface addToCart: cartID item: itemSoldByTheStore amount: 1.
+	items := storeRestInterface listCart: cartID.
+	
+	self assert: (items includesKey: itemSoldByTheStore).
+	self assert: (items at: itemSoldByTheStore) equals: 1.
+	! !
+
+!StoreRestInterfaceTest methodsFor: 'testing' stamp: 'ft 11/25/2018 18:31:19'!
+test04DifferentItemsOnCartAreListedCorrectly
+	
+	| storeRestInterface cartID items itemSoldByTheStore anotherItemSoldByTheStore |
+	
+	storeRestInterface := testObjectsFactory createInterface.
+	cartID := testObjectsFactory createCartForInterface: storeRestInterface.
+	itemSoldByTheStore := testObjectsFactory itemSellByTheStore.
+	anotherItemSoldByTheStore := testObjectsFactory anotherItemSellByTheStore.
+	
+	storeRestInterface addToCart: cartID item: itemSoldByTheStore amount: 1.
+	storeRestInterface addToCart: cartID item: anotherItemSoldByTheStore amount: 2.
+	items := storeRestInterface listCart: cartID.
+	
+	self assert: (items includesKey: itemSoldByTheStore).
+	self assert: (items at: itemSoldByTheStore) equals: 1.
+	self assert: (items includesKey: anotherItemSoldByTheStore).
+	self assert: (items at: anotherItemSoldByTheStore) equals: 2.
+! !
+
+!StoreRestInterfaceTest methodsFor: 'testing' stamp: 'ft 11/25/2018 19:42:48'!
+test05ItemNotInStoreCanNotBeAddedToCart
+	
+	| storeRestInterface cartID |
+	
+	storeRestInterface := testObjectsFactory createInterface.
+	cartID := testObjectsFactory createCartForInterface: storeRestInterface.
+	
+	self 
+		should: [storeRestInterface addToCart: cartID item: testObjectsFactory itemNotSellByTheStore amount: 1]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = StoreRestInterface itemNotSoldByTheStoreErrorMessage.
+			self assert: (storeRestInterface listCart: cartID) isEmpty]! !
+
+!StoreRestInterfaceTest methodsFor: 'testing' stamp: 'ft 11/25/2018 19:55:17'!
+test06CanNotAddInvalidQuantityOfItemToCart
+	
+	| storeRestInterface cartID |
+	
+	storeRestInterface := testObjectsFactory createInterface.
+	cartID := testObjectsFactory createCartForInterface: storeRestInterface.
+	
+	self 
+		should: [storeRestInterface addToCart: cartID item: testObjectsFactory itemSellByTheStore amount: -1]
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = StoreRestInterface invalidQuantityErrorMessage.
+			self assert: (storeRestInterface listCart: cartID) isEmpty]! !
+
+
+!StoreRestInterfaceTest methodsFor: 'setup' stamp: 'ft 11/25/2018 15:48:43'!
+setUp
+
+	testObjectsFactory := StoreTestObjectsFactory new.! !
 
 
 !classDefinition: #Cart category: #TusLibros!
@@ -295,23 +383,23 @@ assertIsValidQuantity: aQuantity
 	aQuantity strictlyPositive ifFalse: [ self error: self invalidQuantityErrorMessage ]! !
 
 
-!Cart methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 17:48'!
+!Cart methodsFor: 'initialization' stamp: 'ft 11/25/2018 17:44:50'!
 initializeAcceptingItemsOf: aCatalog
 
 	catalog := aCatalog.
-	items := OrderedCollection new.! !
+	items := Dictionary new.! !
 
 
-!Cart methodsFor: 'queries' stamp: 'HernanWilkinson 6/17/2013 17:45'!
+!Cart methodsFor: 'queries' stamp: 'ft 11/25/2018 17:59:54'!
 occurrencesOf: anItem
 
-	^items occurrencesOf: anItem  ! !
+	^ items at: anItem ifAbsent: [^0]! !
 
 
-!Cart methodsFor: 'testing' stamp: 'HernanWilkinson 6/17/2013 17:44'!
+!Cart methodsFor: 'testing' stamp: 'ft 11/25/2018 17:46:20'!
 includes: anItem
 
-	^items includes: anItem ! !
+	^items includesKey: anItem ! !
 
 !Cart methodsFor: 'testing' stamp: 'HernanWilkinson 6/17/2013 17:44'!
 isEmpty
@@ -319,10 +407,10 @@ isEmpty
 	^items isEmpty ! !
 
 
-!Cart methodsFor: 'total' stamp: 'HernanWilkinson 6/17/2013 19:09'!
+!Cart methodsFor: 'total' stamp: 'ft 11/25/2018 17:52:59'!
 total
 
-	^ items sum: [ :anItem | catalog at: anItem ]! !
+	^ items keys sum: [ :anItem | (catalog at: anItem) * (items at: anItem)]! !
 
 
 !Cart methodsFor: 'adding' stamp: 'HernanWilkinson 6/17/2013 17:44'!
@@ -330,13 +418,21 @@ add: anItem
 
 	^ self add: 1 of: anItem ! !
 
-!Cart methodsFor: 'adding' stamp: 'HernanWilkinson 6/17/2013 17:51'!
+!Cart methodsFor: 'adding' stamp: 'ft 11/25/2018 17:55:35'!
 add: aQuantity of: anItem
 
 	self assertIsValidQuantity: aQuantity.
 	self assertIsValidItem: anItem.
 
-	1 to: aQuantity do: [ :aNumber | items add: anItem ]! !
+	items at: anItem 
+		ifPresent: [ :currentAmount | items at: anItem put: (currentAmount + aQuantity)]
+		ifAbsent: [items at: anItem put: aQuantity]! !
+
+
+!Cart methodsFor: 'enumerating' stamp: 'ft 11/25/2018 18:05:44'!
+itemsDo: aBlock
+
+	items keysDo: aBlock! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -443,7 +539,7 @@ creditCardHasNoCreditErrorMessage
 
 !classDefinition: #CreditCard category: #TusLibros!
 Object subclass: #CreditCard
-	instanceVariableNames: 'expiration'
+	instanceVariableNames: 'expiration name number'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -454,10 +550,12 @@ isExpiredOn: aDate
 	^expiration start < (Month month: aDate monthIndex year: aDate yearNumber) start ! !
 
 
-!CreditCard methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 18:38'!
-initializeExpiringOn: aMonth 
-	
-	expiration := aMonth ! !
+!CreditCard methodsFor: 'initialization' stamp: 'ft 11/25/2018 19:30:46'!
+initializeFor: aName withNumber: aNumber expiringOn: aMonth
+
+	name := aName.
+	number := aNumber.
+	expiration := aMonth! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
@@ -465,33 +563,10 @@ initializeExpiringOn: aMonth
 CreditCard class
 	instanceVariableNames: ''!
 
-!CreditCard class methodsFor: 'instance creation' stamp: 'HernanWilkinson 6/17/2013 18:38'!
-expiringOn: aMonth 
+!CreditCard class methodsFor: 'instance creation' stamp: 'ft 11/25/2018 19:36:07'!
+for: aName withNumber: aNumber expiringOn: aMonth 
 	
-	^self new initializeExpiringOn: aMonth! !
-
-
-!classDefinition: #RestInterface category: #TusLibros!
-Object subclass: #RestInterface
-	instanceVariableNames: ''
-	classVariableNames: ''
-	poolDictionaries: ''
-	category: 'TusLibros'!
-
-!RestInterface methodsFor: 'operations' stamp: 'ft 11/22/2018 19:56:45'!
-addToCart: aCartID! !
-
-!RestInterface methodsFor: 'operations' stamp: 'ft 11/22/2018 20:02:29'!
-checkoutCart: aCartID withCreditCardNumber: aCreditCardNumber whichExpirationDateIs: anExpirationDate andItsNameIs: aName! !
-
-!RestInterface methodsFor: 'operations' stamp: 'ft 11/22/2018 19:55:59'!
-createCartForClient: aClientID withPassword: aPassword ! !
-
-!RestInterface methodsFor: 'operations' stamp: 'ft 11/22/2018 19:57:01'!
-listCart: aCartID! !
-
-!RestInterface methodsFor: 'operations' stamp: 'ft 11/22/2018 20:02:56'!
-listPurchasesForClient: aClientID withPassword: aPassword! !
+	^self new initializeFor: aName withNumber: aNumber expiringOn: aMonth! !
 
 
 !classDefinition: #Sale category: #TusLibros!
@@ -525,12 +600,128 @@ of: aTotal
 	^self new initializeTotal: aTotal ! !
 
 
+!classDefinition: #StoreRestInterface category: #TusLibros!
+Object subclass: #StoreRestInterface
+	instanceVariableNames: 'clients carts catalog'
+	classVariableNames: ''
+	poolDictionaries: ''
+	category: 'TusLibros'!
+!StoreRestInterface commentStamp: '<historical>' prior: 0!
+-¿Qué invariante se puede mantener en el test de crear un carrito para un cliente inválido?
+-¿Hay que hacer un chequeo de los parámetros para cada operación? (clientID, cartID)
+-¿Cómo hacemos para que el carrito creado por RestInterface tenga el catálogo necesario?
+-Si creamos una clase Store que maneje todo,
+	--¿hay que remover las aserciones en el carrito con respecto a item del catálogo y cantidad positiva?
+	--¿le corresponde verificar que los clientes estén en su base de datos o es responsabilidad de la interfaz?
+-¿Está bien haber implementado el mensaje #itemsDo para los items del carrito?!
+
+
+!StoreRestInterface methodsFor: 'operations' stamp: 'ft 11/25/2018 19:56:25'!
+addToCart: aCartID item: anItem amount: anAmount
+
+	| cart |
+
+	cart := carts at: aCartID.
+	
+	[ cart assertIsValidItem: anItem ]
+		on: Error
+		do: [ self error: self class itemNotSoldByTheStoreErrorMessage].
+	
+	[ cart assertIsValidQuantity: anAmount ]
+		on: Error
+		do: [ self error: self class invalidQuantityErrorMessage].
+	
+	cart add: anAmount of: anItem.! !
+
+!StoreRestInterface methodsFor: 'operations' stamp: 'ft 11/22/2018 20:02:29'!
+checkoutCart: aCartID withCreditCardNumber: aCreditCardNumber whichExpirationDateIs: anExpirationDate andItsNameIs: aName! !
+
+!StoreRestInterface methodsFor: 'operations' stamp: 'ft 11/25/2018 20:05:32'!
+createCartForClient: aClientID withPassword: aPassword 
+
+	| newCartID |
+
+	self assertIsValidClient: aClientID withPassword: aPassword.
+	
+	newCartID := carts keys size + 1.
+	carts at: newCartID put: (Cart acceptingItemsOf: catalog).
+	
+	^newCartID! !
+
+!StoreRestInterface methodsFor: 'operations' stamp: 'ft 11/25/2018 18:11:19'!
+listCart: aCartID
+
+	| items cart |
+
+	items := Dictionary new.
+	cart := carts at: aCartID.
+	
+	cart itemsDo: [ :anItem | items at: anItem put: (cart occurrencesOf: anItem)].
+	
+	^ items! !
+
+!StoreRestInterface methodsFor: 'operations' stamp: 'ft 11/22/2018 20:02:56'!
+listPurchasesForClient: aClientID withPassword: aPassword! !
+
+
+!StoreRestInterface methodsFor: 'initialization' stamp: 'ft 11/25/2018 20:05:12'!
+initializeWithClients: aListOfClients withCatalog: aCatalog.
+
+	clients := aListOfClients.
+	catalog := aCatalog.
+	carts := Dictionary new.! !
+
+
+!StoreRestInterface methodsFor: 'assertions' stamp: 'ft 11/25/2018 16:46:32'!
+assertIsValidClient: aClientID withPassword: aPassword
+
+	((clients includesKey: aClientID) and: [(clients at: aClientID) = aPassword]) ifFalse: [^self error: self class invalidClientErrorMessage]! !
+
+
+"-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
+
+!classDefinition: 'StoreRestInterface class' category: #TusLibros!
+StoreRestInterface class
+	instanceVariableNames: ''!
+
+!StoreRestInterface class methodsFor: 'error messages' stamp: 'ft 11/25/2018 16:17:10'!
+invalidClientErrorMessage
+
+	^'The client ID or password is invalid'! !
+
+!StoreRestInterface class methodsFor: 'error messages' stamp: 'ft 11/25/2018 19:57:04'!
+invalidQuantityErrorMessage
+
+	^'Invalid number of items'! !
+
+!StoreRestInterface class methodsFor: 'error messages' stamp: 'ft 11/25/2018 19:42:18'!
+itemNotSoldByTheStoreErrorMessage
+
+	^'The item is not sold by the store'! !
+
+
+!StoreRestInterface class methodsFor: 'class initialization' stamp: 'ft 11/25/2018 20:04:53'!
+withClients: aListOfClients withCatalog: aCatalog
+
+	^self new initializeWithClients: aListOfClients withCatalog: aCatalog! !
+
+
 !classDefinition: #StoreTestObjectsFactory category: #TusLibros!
 Object subclass: #StoreTestObjectsFactory
 	instanceVariableNames: 'today'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
+
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'ft 11/25/2018 18:29:09'!
+anotherItemSellByTheStore
+	
+	^ 'validBook2'! !
+
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'ft 11/25/2018 18:29:17'!
+anotherItemSellByTheStorePrice
+	
+	^ 20! !
 
 !StoreTestObjectsFactory methodsFor: 'items' stamp: 'HernanWilkinson 6/17/2013 18:08'!
 itemNotSellByTheStore
@@ -553,23 +744,24 @@ createCart
 	
 	^Cart acceptingItemsOf: self defaultCatalog! !
 
-!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'HernanWilkinson 6/17/2013 18:08'!
+!StoreTestObjectsFactory methodsFor: 'cart' stamp: 'ft 11/25/2018 18:29:48'!
 defaultCatalog
 	
 	^ Dictionary new
 		at: self itemSellByTheStore put: self itemSellByTheStorePrice;
+		at: self anotherItemSellByTheStore put: self anotherItemSellByTheStorePrice;
 		yourself ! !
 
 
-!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'HernanWilkinson 6/17/2013 18:37'!
+!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'ft 11/25/2018 20:07:34'!
 expiredCreditCard
 	
-	^CreditCard expiringOn: (Month month: today monthIndex year: today yearNumber - 1)! !
+	^CreditCard for: 'Diego Maradona' withNumber: 1234567890123456 expiringOn: (Month month: today monthIndex year: today yearNumber - 1)! !
 
-!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'HernanWilkinson 6/17/2013 18:36'!
+!StoreTestObjectsFactory methodsFor: 'credit card' stamp: 'ft 11/25/2018 20:07:46'!
 notExpiredCreditCard
 	
-	^CreditCard expiringOn: (Month month: today monthIndex year: today yearNumber + 1)! !
+	^CreditCard for: 'Diego Maradona' withNumber: 1234567890123455 expiringOn: (Month month: today monthIndex year: today yearNumber + 1)! !
 
 
 !StoreTestObjectsFactory methodsFor: 'initialization' stamp: 'HernanWilkinson 6/17/2013 18:37'!
@@ -582,3 +774,42 @@ initialize
 today
 	
 	^ today! !
+
+
+!StoreTestObjectsFactory methodsFor: 'rest interface' stamp: 'ft 11/25/2018 18:15:11'!
+createCartForInterface: aStoreRestInterface
+
+	^aStoreRestInterface createCartForClient: self validClient withPassword: self validPassword! !
+
+!StoreTestObjectsFactory methodsFor: 'rest interface' stamp: 'ft 11/25/2018 20:06:11'!
+createInterface
+
+	^StoreRestInterface withClients: self defaultClients withCatalog: self defaultCatalog! !
+
+
+!StoreTestObjectsFactory methodsFor: 'clients' stamp: 'ft 11/25/2018 16:37:58'!
+defaultClients
+
+	^Dictionary new
+		at: self validClient put: self validPassword;
+		yourself! !
+
+!StoreTestObjectsFactory methodsFor: 'clients' stamp: 'ft 11/25/2018 16:02:46'!
+invalidClient
+
+	^-1! !
+
+!StoreTestObjectsFactory methodsFor: 'clients' stamp: 'ft 11/25/2018 16:26:24'!
+invalidPassword
+
+	^'anInvalidPassword'! !
+
+!StoreTestObjectsFactory methodsFor: 'clients' stamp: 'ft 11/25/2018 16:26:05'!
+validClient
+
+	^1! !
+
+!StoreTestObjectsFactory methodsFor: 'clients' stamp: 'ft 11/25/2018 16:26:28'!
+validPassword
+
+	^'aValidPassword'! !
