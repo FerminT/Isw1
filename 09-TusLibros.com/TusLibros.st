@@ -347,6 +347,45 @@ test06CanNotAddInvalidQuantityOfItemToCart
 			self assert: anError messageText = StoreRestInterface invalidQuantityErrorMessage.
 			self assert: (storeRestInterface listCart: cartID) isEmpty]! !
 
+!StoreRestInterfaceTest methodsFor: 'testing' stamp: 'ft 11/26/2018 14:21:00'!
+test07CanNotCheckoutToExpiredCreditCard
+	
+	| storeRestInterface cartID |
+	
+	storeRestInterface := testObjectsFactory createInterface.
+	cartID := testObjectsFactory createCartForInterface: storeRestInterface.
+	storeRestInterface addToCart: cartID item: testObjectsFactory itemSellByTheStore amount: 1.
+	
+	
+	self 
+		should: [storeRestInterface 
+					checkoutCart: cartID 
+					withCreditCardNumber: 1234567890123456 
+					whichExpirationDateIs: (Month month: testObjectsFactory today monthIndex year: testObjectsFactory today yearNumber - 1)
+					andItsNameIs: 'Diego Maradona']
+		raise: Error
+		withExceptionDo: [ :anError |
+			self assert: anError messageText = StoreRestInterface expiredCreditCardErrorMessage.
+			"asertar que no se hizo la compra para el cliente"]! !
+
+!StoreRestInterfaceTest methodsFor: 'testing' stamp: 'ft 11/26/2018 14:28:31'!
+test08CartCheckoutRegistersSaleForClient
+	
+	| storeRestInterface cartID |
+	
+	storeRestInterface := testObjectsFactory createInterface.
+	cartID := testObjectsFactory createCartForInterface: storeRestInterface.
+	storeRestInterface addToCart: cartID item: testObjectsFactory itemSellByTheStore amount: 1.
+	
+	storeRestInterface 
+					checkoutCart: cartID 
+					withCreditCardNumber: 1234567890123456 
+					whichExpirationDateIs: (Month month: testObjectsFactory today monthIndex year: testObjectsFactory today yearNumber - 1)
+					andItsNameIs: 'Diego Maradona'.
+	
+	self assert: (storeRestInterface listCart: cartID) isEmpty.
+	"asertar que se hizo la compra para el cliente"! !
+
 
 !StoreRestInterfaceTest methodsFor: 'setup' stamp: 'ft 11/25/2018 15:48:43'!
 setUp
@@ -612,8 +651,10 @@ Object subclass: #StoreRestInterface
 -¿Cómo hacemos para que el carrito creado por RestInterface tenga el catálogo necesario?
 -Si creamos una clase Store que maneje todo,
 	--¿hay que remover las aserciones en el carrito con respecto a item del catálogo y cantidad positiva?
+	--¿qué ocurren con las aserciones del cashier con respecto a la tarjeta de crédito?
 	--¿le corresponde verificar que los clientes estén en su base de datos o es responsabilidad de la interfaz?
--¿Está bien haber implementado el mensaje #itemsDo para los items del carrito?!
+-¿Está bien haber implementado el mensaje #itemsDo para los items del carrito?
+-¿Qué debería ocurrir con el carrito después del checkout? ¿Se puede seguir usando?!
 
 
 !StoreRestInterface methodsFor: 'operations' stamp: 'ft 11/25/2018 19:56:25'!
@@ -633,8 +674,16 @@ addToCart: aCartID item: anItem amount: anAmount
 	
 	cart add: anAmount of: anItem.! !
 
-!StoreRestInterface methodsFor: 'operations' stamp: 'ft 11/22/2018 20:02:29'!
-checkoutCart: aCartID withCreditCardNumber: aCreditCardNumber whichExpirationDateIs: anExpirationDate andItsNameIs: aName! !
+!StoreRestInterface methodsFor: 'operations' stamp: 'ft 11/26/2018 14:12:20'!
+checkoutCart: aCartID withCreditCardNumber: aCreditCardNumber whichExpirationDateIs: anExpirationDate andItsNameIs: aName
+
+	| creditCard cart |
+	
+	creditCard := CreditCard for: aName withNumber: aCreditCardNumber expiringOn: anExpirationDate.
+	cart := carts at: aCartID.
+	
+	
+	! !
 
 !StoreRestInterface methodsFor: 'operations' stamp: 'ft 11/25/2018 20:05:32'!
 createCartForClient: aClientID withPassword: aPassword 
@@ -676,7 +725,6 @@ initializeWithClients: aListOfClients withCatalog: aCatalog.
 assertIsValidClient: aClientID withPassword: aPassword
 
 	((clients includesKey: aClientID) and: [(clients at: aClientID) = aPassword]) ifFalse: [^self error: self class invalidClientErrorMessage]! !
-
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
