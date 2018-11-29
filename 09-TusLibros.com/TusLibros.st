@@ -391,7 +391,7 @@ test08CartCheckoutRegistersSaleForClient
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Store invalidCartErrorMessage]! !
 
-!StoreTest methodsFor: 'testing' stamp: 'ft 11/26/2018 19:12:59'!
+!StoreTest methodsFor: 'testing' stamp: 'ft 11/29/2018 09:48:04'!
 test09DifferentPurchasesFromSameClientAreRegistered
 	
 	| store cartID itemsSold |
@@ -408,6 +408,7 @@ test09DifferentPurchasesFromSameClientAreRegistered
 	
 	cartID := testObjectsFactory createCartForStore: store.
 	store addToCart: cartID item: testObjectsFactory anotherItemSellByTheStore amount: 2.
+	store addToCart: cartID item: testObjectsFactory itemSellByTheStore amount: 1.
 	
 	store 
 		checkoutCart: cartID 
@@ -418,9 +419,9 @@ test09DifferentPurchasesFromSameClientAreRegistered
 		
 	itemsSold := store listPurchasesForClient: testObjectsFactory validClient withPassword: testObjectsFactory validPassword.	
 	
-	self assert: (itemsSold at: testObjectsFactory itemSellByTheStore) equals: 1.
+	self assert: (itemsSold at: testObjectsFactory itemSellByTheStore) equals: 2.
 	self assert: (itemsSold at: testObjectsFactory anotherItemSellByTheStore) equals: 2.
-	self assert: itemsSold values sum equals: 3.! !
+	self assert: itemsSold values sum equals: 4.! !
 
 !StoreTest methodsFor: 'testing' stamp: 'ft 11/26/2018 20:00:33'!
 test10CanNotAddItemToNotCreatedCart
@@ -686,8 +687,8 @@ total
 	^ total! !
 
 
-!Sale methodsFor: 'initialization' stamp: 'ft 11/26/2018 18:27:31'!
-initializeCart: aCart
+!Sale methodsFor: 'initialization' stamp: 'ft 11/29/2018 09:38:52'!
+initializeOf: aCart
 
 	items := Dictionary new.
 	aCart itemsDo: [ :anItem | items at: anItem put: (aCart occurrencesOf: anItem)].
@@ -705,11 +706,10 @@ items
 Sale class
 	instanceVariableNames: ''!
 
-!Sale class methodsFor: 'instance creation' stamp: 'ft 11/26/2018 18:19:51'!
+!Sale class methodsFor: 'instance creation' stamp: 'ft 11/29/2018 09:38:40'!
 of: aCart
 
-	"should assert total is not negative or 0!!"
-	^self new initializeCart: aCart ! !
+	^self new initializeOf: aCart ! !
 
 
 !classDefinition: #Store category: #TusLibros!
@@ -785,7 +785,7 @@ listCart: aCartID
 	
 	^ items! !
 
-!Store methodsFor: 'operations' stamp: 'ft 11/26/2018 19:23:05'!
+!Store methodsFor: 'operations' stamp: 'ft 11/29/2018 10:00:37'!
 listPurchasesForClient: aClientID withPassword: aPassword
 
 	| sales soldItems |
@@ -794,7 +794,10 @@ listPurchasesForClient: aClientID withPassword: aPassword
 	
 	soldItems := Dictionary new.
 	sales := clientsSales at: aClientID ifAbsent: [^OrderedCollection new].
-	sales do: [ :aSale | soldItems addAll: aSale items].
+	sales do: [ :aSale |
+					 aSale items keysDo: [ :anItem | soldItems at: anItem 
+														ifPresent: [ :amount | soldItems at: anItem put: (amount + aSale items at: anItem)] 
+														ifAbsent: [soldItems at: anItem put: (aSale items at: anItem)]]].
 	
 	^ soldItems! !
 
@@ -870,20 +873,20 @@ anotherItemSellByTheStorePrice
 	
 	^ 20! !
 
-!StoreTestObjectsFactory methodsFor: 'items' stamp: 'HernanWilkinson 6/17/2013 18:08'!
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'ft 11/29/2018 09:37:19'!
 itemNotSellByTheStore
 	
-	^'invalidBook'! !
+	^ 'invalidBook'! !
 
 !StoreTestObjectsFactory methodsFor: 'items' stamp: 'HernanWilkinson 6/17/2013 18:08'!
 itemSellByTheStore
 	
 	^ 'validBook'! !
 
-!StoreTestObjectsFactory methodsFor: 'items' stamp: 'HernanWilkinson 6/17/2013 18:08'!
+!StoreTestObjectsFactory methodsFor: 'items' stamp: 'ft 11/29/2018 09:37:11'!
 itemSellByTheStorePrice
 	
-	^10! !
+	^ 10! !
 
 
 !StoreTestObjectsFactory methodsFor: 'cart' stamp: 'HernanWilkinson 6/17/2013 18:08'!
