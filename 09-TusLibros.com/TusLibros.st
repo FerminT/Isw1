@@ -341,7 +341,7 @@ test06CanNotAddInvalidQuantityOfItemToCart
 			self assert: anError messageText = Store invalidQuantityErrorMessage.
 			self assert: (storeRestInterface listCart: cartID) isEmpty]! !
 
-!StoreTest methodsFor: 'testing' stamp: 'ft 11/29/2018 13:19:32'!
+!StoreTest methodsFor: 'testing' stamp: 'ft 11/30/2018 10:17:01'!
 test07CanNotCheckoutToExpiredCreditCard
 	
 	| store cartID |
@@ -359,8 +359,8 @@ test07CanNotCheckoutToExpiredCreditCard
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Store canNotChargeAnExpiredCreditCardErrorMessage.
-			self assert: (store listPurchasesForClient: testObjectsFactory validClient withPassword: testObjectsFactory validPassword) isEmpty.
-			self assert: (store listCart: cartID) isEmpty not]! !
+			self assert: (store listPurchasesForClient: testObjectsFactory validClient withPassword: testObjectsFactory validPassword) total equals: 0.
+			self deny: (store listCart: cartID) isEmpty]! !
 
 !StoreTest methodsFor: 'testing' stamp: 'ft 11/29/2018 13:16:49'!
 test08CartCheckoutRegistersSaleForClient
@@ -936,7 +936,7 @@ addToCart: aCartID item: anItem amount: anAmount
 	
 	(cartsSessions at: aCartID) executeIfNotExpired: [ :aCart | aCart add: anAmount of: anItem ]! !
 
-!Store methodsFor: 'operations' stamp: 'ft 11/29/2018 13:27:50'!
+!Store methodsFor: 'operations' stamp: 'ft 11/30/2018 10:13:59'!
 checkoutCart: aCartID withCreditCardNumber: aCreditCardNumber expiringOn: anExpirationDate ownedBy: aName
 
 	| creditCard cartSession salesBook |
@@ -944,7 +944,7 @@ checkoutCart: aCartID withCreditCardNumber: aCreditCardNumber expiringOn: anExpi
 	self assertIsValidCart: aCartID.
 	
 	cartSession := cartsSessions at: aCartID.
-	salesBook := OrderedCollection new.
+	salesBook := self retrieveSalesMadeTo: cartSession owner.
 	
 	cartSession executeIfNotExpired: [ :aCart |
 						creditCard := CreditCard for: aName withNumber: aCreditCardNumber expiringOn: anExpirationDate.
@@ -955,7 +955,6 @@ checkoutCart: aCartID withCreditCardNumber: aCreditCardNumber expiringOn: anExpi
 									on: DateAndTime now
 									registeringOn: salesBook) checkOut].
 	
-	self registerSale: salesBook to: cartSession owner.
 	self removeSession: aCartID.! !
 
 !Store methodsFor: 'operations' stamp: 'ft 11/29/2018 11:57:22'!
@@ -1028,19 +1027,17 @@ createNewCartFor: aClientID
 	
 	^ lastID! !
 
-!Store methodsFor: 'operations - private' stamp: 'ft 11/29/2018 13:31:09'!
-registerSale: aSalesBook to: aClientID
-
-	clientsSales at: aClientID
-			ifPresent: [ :sales | sales addAll: aSalesBook.
-					 	clientsSales at: aClientID put: sales ]
-			ifAbsent: [ clientsSales at: aClientID put: aSalesBook ]
-! !
-
 !Store methodsFor: 'operations - private' stamp: 'ft 11/29/2018 13:28:00'!
 removeSession: aCartID
 
 	cartsSessions removeKey: aCartID! !
+
+!Store methodsFor: 'operations - private' stamp: 'ft 11/30/2018 10:15:22'!
+retrieveSalesMadeTo: aClientID
+
+	(clientsSales includesKey: aClientID) ifFalse: [clientsSales at: aClientID put: OrderedCollection new].
+	
+	^ clientsSales at: aClientID! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
