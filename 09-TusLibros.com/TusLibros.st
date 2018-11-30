@@ -248,7 +248,7 @@ debit: anAmount from: aCreditCard
 
 !classDefinition: #StoreTest category: #TusLibros!
 TestCase subclass: #StoreTest
-	instanceVariableNames: 'testObjectsFactory itemSoldByTheStore anotherItemSoldByTheStore'
+	instanceVariableNames: 'testObjectsFactory itemSoldByTheStore anotherItemSoldByTheStore validClient validPassword'
 	classVariableNames: ''
 	poolDictionaries: ''
 	category: 'TusLibros'!
@@ -341,7 +341,7 @@ test06CanNotAddInvalidQuantityOfItemToCart
 			self assert: anError messageText = Store invalidQuantityErrorMessage.
 			self assert: (storeRestInterface listCart: cartID) isEmpty]! !
 
-!StoreTest methodsFor: 'testing' stamp: 'ft 11/30/2018 10:17:01'!
+!StoreTest methodsFor: 'testing' stamp: 'ft 11/30/2018 14:26:47'!
 test07CanNotCheckoutToExpiredCreditCard
 	
 	| store cartID |
@@ -359,10 +359,10 @@ test07CanNotCheckoutToExpiredCreditCard
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Store canNotChargeAnExpiredCreditCardErrorMessage.
-			self assert: (store listPurchasesForClient: testObjectsFactory validClient withPassword: testObjectsFactory validPassword) total equals: 0.
+			self assert: (store listPurchasesForClient: validClient withPassword: validPassword) total equals: 0.
 			self deny: (store listCart: cartID) isEmpty]! !
 
-!StoreTest methodsFor: 'testing' stamp: 'ft 11/29/2018 13:16:49'!
+!StoreTest methodsFor: 'testing' stamp: 'ft 11/30/2018 14:26:56'!
 test08CartCheckoutRegistersSaleForClient
 	
 	| store cartID itemsSold |
@@ -373,7 +373,7 @@ test08CartCheckoutRegistersSaleForClient
 	
 	testObjectsFactory checkout: cartID for: store.
 	
-	itemsSold := store listPurchasesForClient: testObjectsFactory validClient withPassword: testObjectsFactory validPassword.	
+	itemsSold := store listPurchasesForClient: validClient withPassword: validPassword.	
 	
 	self assert: (itemsSold includes: itemSoldByTheStore).
 	self assert: (itemsSold occurrencesOf: itemSoldByTheStore) equals: 1.
@@ -384,7 +384,7 @@ test08CartCheckoutRegistersSaleForClient
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Store invalidCartErrorMessage]! !
 
-!StoreTest methodsFor: 'testing' stamp: 'ft 11/29/2018 13:17:29'!
+!StoreTest methodsFor: 'testing' stamp: 'ft 11/30/2018 14:27:12'!
 test09DifferentPurchasesFromSameClientAreRegistered
 	
 	| store cartID itemsSold |
@@ -401,7 +401,7 @@ test09DifferentPurchasesFromSameClientAreRegistered
 	
 	testObjectsFactory checkout: cartID for: store.		
 		
-	itemsSold := store listPurchasesForClient: testObjectsFactory validClient withPassword: testObjectsFactory validPassword.	
+	itemsSold := store listPurchasesForClient: validClient withPassword: validPassword.	
 	
 	self assert: (itemsSold includes: itemSoldByTheStore).
 	self assert: (itemsSold includes: anotherItemSoldByTheStore).
@@ -471,19 +471,19 @@ test14CanNotListPurchasesOfInvalidCustomer
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Store invalidClientErrorMessage]! !
 
-!StoreTest methodsFor: 'testing' stamp: 'ft 11/29/2018 13:04:33'!
+!StoreTest methodsFor: 'testing' stamp: 'ft 11/30/2018 14:27:47'!
 test15CanNotListPurchasesOfValidCustomerWithInvalidPassword
 
 	| store |
 	
 	store := testObjectsFactory createStore.
 	
-	self should: [ store listPurchasesForClient: testObjectsFactory validClient withPassword: testObjectsFactory invalidPassword ]
+	self should: [ store listPurchasesForClient: validClient withPassword: testObjectsFactory invalidPassword ]
 		raise: Error
 		withExceptionDo: [ :anError |
 			self assert: anError messageText = Store invalidClientErrorMessage]! !
 
-!StoreTest methodsFor: 'testing' stamp: 'ft 11/29/2018 13:05:32'!
+!StoreTest methodsFor: 'testing' stamp: 'ft 11/30/2018 14:27:55'!
 test16CanNotCreateCartForValidCustomerWithInvalidPassword
 
 	| store |
@@ -492,7 +492,7 @@ test16CanNotCreateCartForValidCustomerWithInvalidPassword
 	
 	self
 		should: [store
-					createCartForClient: testObjectsFactory validClient
+					createCartForClient: validClient
 					withPassword: testObjectsFactory invalidPassword]
 		raise: Error
 		withExceptionDo: [ :anError |
@@ -556,12 +556,14 @@ test19CanNotListItemsOfExpiredCart
 			self assert: anError messageText = Store expiredCartErrorMessage]! !
 
 
-!StoreTest methodsFor: 'setup' stamp: 'ft 11/29/2018 13:15:03'!
+!StoreTest methodsFor: 'setup' stamp: 'ft 11/30/2018 14:18:18'!
 setUp
 
 	testObjectsFactory := StoreTestObjectsFactory new.
 	itemSoldByTheStore := testObjectsFactory itemSellByTheStore.
-	anotherItemSoldByTheStore := testObjectsFactory anotherItemSellByTheStore! !
+	anotherItemSoldByTheStore := testObjectsFactory anotherItemSellByTheStore.
+	validClient := testObjectsFactory validClient.
+	validPassword := testObjectsFactory validPassword! !
 
 
 !classDefinition: #Cart category: #TusLibros!
@@ -672,14 +674,12 @@ initializeFor: aCart ownedBy: aClientID withClock: aClock
 	time := clock time.! !
 
 
-!CartSession methodsFor: 'operations' stamp: 'ft 11/29/2018 12:07:09'!
-executeIfNotExpired: aBlock
+!CartSession methodsFor: 'operations' stamp: 'ft 11/30/2018 15:27:38'!
+ifNotExpiredDo: aBlock
 
 	self assertCartHasNotExpired.
 	
-	aBlock value: cart.
-	
-	self updateCurrentTime.! !
+	[aBlock value: cart] ensure: [self updateCurrentTime]! !
 
 
 !CartSession methodsFor: 'assertions' stamp: 'ft 11/29/2018 12:08:29'!
@@ -929,55 +929,49 @@ Hacer que todas las fechas sean relativas al reloj del Store (!!!!!!)
 withCartSession: aCartSession do: aBlock -> el mensaje se forwardea a la cartSession (addToCart, etc.). Ver que no expiró la sesión dentro de ese mensaje.!
 
 
-!Store methodsFor: 'operations' stamp: 'ft 11/29/2018 12:50:14'!
+!Store methodsFor: 'operations' stamp: 'ft 11/30/2018 15:27:38'!
 addToCart: aCartID item: anItem amount: anAmount
-	
-	self assertIsValidCart: aCartID.
-	
-	(cartsSessions at: aCartID) executeIfNotExpired: [ :aCart | aCart add: anAmount of: anItem ]! !
 
-!Store methodsFor: 'operations' stamp: 'ft 11/30/2018 10:13:59'!
+	(self getSessionOf: aCartID) ifNotExpiredDo: [ :aCart | aCart add: anAmount of: anItem ]! !
+
+!Store methodsFor: 'operations' stamp: 'ft 11/30/2018 15:27:38'!
 checkoutCart: aCartID withCreditCardNumber: aCreditCardNumber expiringOn: anExpirationDate ownedBy: aName
 
 	| creditCard cartSession salesBook |
 	
-	self assertIsValidCart: aCartID.
-	
-	cartSession := cartsSessions at: aCartID.
+	cartSession := self getSessionOf: aCartID.
 	salesBook := self retrieveSalesMadeTo: cartSession owner.
 	
-	cartSession executeIfNotExpired: [ :aCart |
-						creditCard := CreditCard for: aName withNumber: aCreditCardNumber expiringOn: anExpirationDate.
+	cartSession ifNotExpiredDo: [ :aCart |
+									creditCard := CreditCard for: aName withNumber: aCreditCardNumber expiringOn: anExpirationDate.
+									
+									(Cashier toCheckout: aCart
+										charging: creditCard
+										throught: merchantProcessor
+										on: DateAndTime now
+										registeringOn: salesBook) checkOut].
 	
-						(Cashier toCheckout: aCart
-									charging: creditCard
-									throught: merchantProcessor
-									on: DateAndTime now
-									registeringOn: salesBook) checkOut].
-	
-	self removeSession: aCartID.! !
+	self removeSessionOf: aCartID! !
 
-!Store methodsFor: 'operations' stamp: 'ft 11/29/2018 11:57:22'!
+!Store methodsFor: 'operations' stamp: 'ft 11/30/2018 13:34:23'!
 createCartForClient: aClientID withPassword: aPassword 
 
 	self assertIsValidClient: aClientID withPassword: aPassword.
 	
-	^ self createNewCartFor: aClientID.! !
+	^ self createCartSessionFor: aClientID.! !
 
-!Store methodsFor: 'operations' stamp: 'ft 11/29/2018 12:29:55'!
+!Store methodsFor: 'operations' stamp: 'ft 11/30/2018 15:51:45'!
 listCart: aCartID
 
 	| items |
-	
-	self assertIsValidCart: aCartID.
 
 	items := Dictionary new.
-		
-	(cartsSessions at: aCartID) executeIfNotExpired: [ :aCart | aCart itemsDo: [ :anItem | items at: anItem put: (aCart occurrencesOf: anItem)]].
+	
+	(self getSessionOf: aCartID) ifNotExpiredDo: [ :aCart | self addItemsFrom: aCart to: items].
 	
 	^ items! !
 
-!Store methodsFor: 'operations' stamp: 'ft 11/29/2018 11:47:29'!
+!Store methodsFor: 'operations' stamp: 'ft 11/30/2018 15:55:53'!
 listPurchasesForClient: aClientID withPassword: aPassword
 
 	| sales soldItems total |
@@ -986,14 +980,13 @@ listPurchasesForClient: aClientID withPassword: aPassword
 	
 	soldItems := Dictionary new.
 	total := 0.
-	sales := clientsSales at: aClientID ifAbsent: [^OrderedCollection new].
-	sales do: [ :aSale |
-					 total := total + aSale total.
-					 aSale itemsDo: [ :anItem | soldItems at: anItem 
-														ifPresent: [ :amount | soldItems at: anItem put: (amount + (aSale occurrencesOf: anItem))] 
-														ifAbsent: [soldItems at: anItem put: (aSale occurrencesOf: anItem)]]].
+	sales := self retrieveSalesMadeTo: aClientID.
 	
-	^Sale of: soldItems value: total! !
+	sales do: [ :aSale |
+					total := total + aSale total.
+					self addItemsFrom: aSale to: soldItems].
+	
+	^ Sale of: soldItems value: total! !
 
 
 !Store methodsFor: 'initialization' stamp: 'ft 11/29/2018 12:33:43'!
@@ -1008,36 +1001,52 @@ initializeWithClients: aListOfClients withCatalog: aCatalog withMerchantProcesso
 	clock := aClock! !
 
 
-!Store methodsFor: 'assertions' stamp: 'ft 11/29/2018 12:28:47'!
-assertIsValidCart: aCartID
-
-	(cartsSessions includesKey: aCartID) ifFalse: [^self error: self class invalidCartErrorMessage]! !
-
 !Store methodsFor: 'assertions' stamp: 'ft 11/26/2018 17:32:18'!
 assertIsValidClient: aClientID withPassword: aPassword
 
 	((validClients includesKey: aClientID) and: [(validClients at: aClientID) = aPassword]) ifFalse: [^self error: self class invalidClientErrorMessage]! !
 
 
-!Store methodsFor: 'operations - private' stamp: 'ft 11/29/2018 13:01:25'!
-createNewCartFor: aClientID
+!Store methodsFor: 'cart sessions - private' stamp: 'ft 11/30/2018 13:34:23'!
+createCartSessionFor: aClientID
 
 	lastID := lastID + 1.	
 	cartsSessions at: lastID put: (CartSession for: (Cart acceptingItemsOf: catalog) ownedBy: aClientID withClock: clock).
 	
 	^ lastID! !
 
-!Store methodsFor: 'operations - private' stamp: 'ft 11/29/2018 13:28:00'!
-removeSession: aCartID
+!Store methodsFor: 'cart sessions - private' stamp: 'ft 11/30/2018 15:24:48'!
+getSessionOf: aCartID
+	
+	cartsSessions at: aCartID
+				ifPresent: [ :aCartSession | ^aCartSession ]
+				ifAbsent: [^self error: self class invalidCartErrorMessage]! !
+
+!Store methodsFor: 'cart sessions - private' stamp: 'ft 11/30/2018 15:25:18'!
+removeSessionOf: aCartID
 
 	cartsSessions removeKey: aCartID! !
 
-!Store methodsFor: 'operations - private' stamp: 'ft 11/30/2018 10:15:22'!
+
+!Store methodsFor: 'sales - private' stamp: 'ft 11/30/2018 10:15:22'!
 retrieveSalesMadeTo: aClientID
 
 	(clientsSales includesKey: aClientID) ifFalse: [clientsSales at: aClientID put: OrderedCollection new].
 	
 	^ clientsSales at: aClientID! !
+
+
+!Store methodsFor: 'collections - private' stamp: 'ft 11/30/2018 15:46:28'!
+add: anAmount of: anItem to: aCollection
+
+	aCollection at: anItem 
+					ifPresent: [ :currentAmount | aCollection at: anItem put: (currentAmount + anAmount)] 
+					ifAbsent: [aCollection at: anItem put: anAmount]! !
+
+!Store methodsFor: 'collections - private' stamp: 'ft 11/30/2018 15:54:13'!
+addItemsFrom: aCollectionOfItems to: aCollection
+
+	aCollectionOfItems itemsDo: [ :anItem | self add: (aCollectionOfItems occurrencesOf: anItem) of: anItem to: aCollection]! !
 
 "-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- "!
 
